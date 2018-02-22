@@ -1,5 +1,6 @@
 package comprithvi.example.notextdriveapp;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -11,5 +12,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //Tejas Branch Test 3
+        Intent intent = new Intent(MainActivity.this, SpeedTestActivity.class);
+        startActivity(intent);
     }
 }
