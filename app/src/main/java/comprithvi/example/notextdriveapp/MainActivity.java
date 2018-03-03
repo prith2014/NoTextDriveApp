@@ -1,7 +1,10 @@
 package comprithvi.example.notextdriveapp;
 
+import android.*;
+import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -28,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
     Location currentLocation, prevLocation;
     LocationRequest mLocationRequest;
 
+    private final int REQUEST_LOCATION = 200;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         distanceTV = findViewById(R.id.distance);
         longitude = findViewById(R.id.longitude);
         latitude = findViewById(R.id.latitude);
+
     }
 
 
@@ -62,8 +68,10 @@ public class MainActivity extends AppCompatActivity {
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION},REQUEST_LOCATION);
             return;
         }
+
         getFusedLocationProviderClient(this).requestLocationUpdates(mLocationRequest, new LocationCallback() {
                     @Override
                     public void onLocationResult(LocationResult locationResult) {
@@ -82,10 +90,19 @@ public class MainActivity extends AppCompatActivity {
                 Double.toString(location.getLongitude());
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
 
-        if (currentLocation != null) {
-            prevLocation = currentLocation;
-            prevTime = prevLocation.getTime();
-        }
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                if (currentLocation != null) {
+                    prevLocation = currentLocation;
+                    prevTime = prevLocation.getTime();
+                }
+            }
+        };
+
+        Handler h = new Handler();
+        h.postDelayed(r, 50);
+
 
         currentTime = currentLocation.getTime();
         longitude.setText(Double.toString(currentLocation.getLongitude()));
@@ -95,11 +112,10 @@ public class MainActivity extends AppCompatActivity {
             float distance = prevLocation.distanceTo(currentLocation);
             distanceTV.setText(Float.toString(distance));
             long timeDifference = currentTime - prevTime;
-            float speed = distance / timeDifference;
-            speedTV.setText(Float.toString(speed));
+            double speed = ((distance/1000) / 0.001388888889);
+            speedTV.setText(Double.toString(speed));
         }
         // You can now create a LatLng Object for use with maps
-
     }
 
     @Override
