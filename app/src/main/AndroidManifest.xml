@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="comprithvi.example.notextdriveapp">
 
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -16,6 +19,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!--<service
+            android:name=".BroadcastReceiverService"
+            android:exported="false" />-->
+        <receiver android:name="MyBTReceiver">
+            <intent-filter>
+                <action android:name="android.bluetooth.BluetoothDevice.ACTION_ACL_CONNECTED" />
+                <action android:name="android.bluetooth.BluetoothDevice.ACTION_ACL_DISCONNECTED" />
+            </intent-filter>
+        </receiver>
+        <activity android:name=".SetupActivity"></activity>
     </application>
 
 </manifest>
