@@ -25,10 +25,10 @@ public class MainActivity extends AppCompatActivity {
     TextView longitude;
     TextView latitude;
 
-    long prevTime;
-    long currentTime;
+    long prevTime, currentTime, prevTime2;
 
-    Location currentLocation, prevLocation;
+
+    Location currentLocation, prevLocation, prevLocation2;
     LocationRequest mLocationRequest;
 
     private final int REQUEST_LOCATION = 200;
@@ -42,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
         currentLocation = null;
         prevTime = 0;
         currentTime = 0;
+        prevTime2 = 0;
+
 
         speedTV = findViewById(R.id.speed);
         distanceTV = findViewById(R.id.distance);
@@ -56,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         // Create the location request to start receiving updates
         mLocationRequest = new LocationRequest();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setInterval(10000);
+        mLocationRequest.setInterval(5000);
         mLocationRequest.setFastestInterval(5000);
 
         // new Google API SDK v11 uses getFusedLocationProviderClient(this)
@@ -97,6 +99,10 @@ public class MainActivity extends AppCompatActivity {
                     prevLocation = currentLocation;
                     prevTime = prevLocation.getTime();
                 }
+                if (prevLocation != null) {
+                    prevLocation2 = prevLocation;
+                    prevTime2 = prevLocation2.getTime();
+                }
             }
         };
 
@@ -108,11 +114,13 @@ public class MainActivity extends AppCompatActivity {
         longitude.setText(Double.toString(currentLocation.getLongitude()));
         latitude.setText(Double.toString(currentLocation.getLatitude()));
 
-        if (prevLocation != null) {
+        if (prevLocation2 != null) {
             float distance = prevLocation.distanceTo(currentLocation);
+            float distance2 = prevLocation2.distanceTo(prevLocation);
+            float avgDistance = (distance + distance2)/2;
             distanceTV.setText(Float.toString(distance));
-            long timeDifference = currentTime - prevTime;
-            double speed = ((distance/1000) / 0.001388888889);
+            //long timeDifference = currentTime - prevTime;
+            double speed = ((avgDistance/1000) / 0.00277777778);
             speedTV.setText(Double.toString(speed));
         }
         // You can now create a LatLng Object for use with maps
