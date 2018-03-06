@@ -7,4 +7,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android" >
 </LinearLayout>
     tools:context="comprithvi.example.notextdriveapp.MainActivity">
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:onClick="setupButton"
+        android:text="Setup"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </android.support.constraint.ConstraintLayout>
