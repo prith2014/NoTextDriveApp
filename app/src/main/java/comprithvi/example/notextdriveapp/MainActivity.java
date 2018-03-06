@@ -1,5 +1,6 @@
 package comprithvi.example.notextdriveapp;
 
+import android.content.Intent;
 import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -28,5 +29,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Intent intent = new Intent(MainActivity.this, SpeedCalcActivity.class);
+        startActivity(intent);
     }
 }
