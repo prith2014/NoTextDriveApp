@@ -4,4 +4,5 @@
     <string name="start_button">Start Notification Blocking</string>
     <string name="stop_button">Stop Notification Blocking</string>
     <string name="send_button">Send Notification</string>
+    <string name="setup">Setup BT</string>
 </resources>

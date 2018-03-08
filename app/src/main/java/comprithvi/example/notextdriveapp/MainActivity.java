@@ -1,6 +1,9 @@
 package comprithvi.example.notextdriveapp;
 
 import android.content.Intent;
+import android.location.Location;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,18 +29,93 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+
+import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
+
 public class MainActivity extends AppCompatActivity {
+
+    // Variables for bluetooth
     String selectedDeviceName;
     String selectedDeviceAddress;
+
+    // Variables for notification blocking
+    private NotificationManager notificationManager;
+    private android.app.Notification builder;
+    String channelId = "default_channel_id";
+    String channelDescription = "Default Channel";
+
+    // Variables for speed calculation
+    TextView speedTV;
+    TextView distanceTV;
+    TextView longitude;
+    TextView latitude;
+    long prevTime, currentTime, prevTime2;
+    Location currentLocation, prevLocation, prevLocation2;
+    LocationRequest mLocationRequest;
+
+    private final int REQUEST_LOCATION = 200;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // SPEED CALCULATION //
+        prevLocation = null;
+        currentLocation = null;
+        prevTime = 0;
+        currentTime = 0;
+        prevTime2 = 0;
+
+        speedTV = findViewById(R.id.speed);
+        distanceTV = findViewById(R.id.distance);
+        longitude = findViewById(R.id.longitude);
+        latitude = findViewById(R.id.latitude);
+
+        // NOTIFICATION BLOCKING //
+
+        // Get the notification Channel
+        if(notificationManager == null){
+            notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        }
+        create_notification_channel();
+
+        // Send Notification
+        Button send = findViewById(R.id.send);
+        send.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                postNotification("Title", "text");
+            }
+        });
+
+        // Start Notification Blocking
+        Button start = findViewById(R.id.start);
+        start.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startNotifBlock();
+            }
+        });
+
+        // Stop Notification Blocking
+        Button stop = findViewById(R.id.stop);
+        stop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopNotifBlock();
+            }
+        });
+
     }
+
+    // BLUETOOTH FUNCTIONS //
 
     // Launch a service in the background that will look for the car's bluetooth signal
     public void launchBRService() {
@@ -63,7 +141,136 @@ public class MainActivity extends AppCompatActivity {
             selectedDeviceAddress = extras.getString("EXTRA_DEVICEADDRESS");
 
         }
-        Intent intent = new Intent(MainActivity.this, SpeedCalcActivity.class);
-        startActivity(intent);
+    }
+
+    // NOTIFICATION FUNCTIONS //
+
+    // Function to send a notification
+    void postNotification(String title, String text){
+        builder = new android.app.Notification.Builder(MainActivity.this, channelId)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setSmallIcon(android.R.drawable.ic_popup_reminder)
+                .build();
+        notificationManager.notify(1, builder);
+    }
+
+    // Function to get the notification channel
+    void create_notification_channel(){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationChannel notificationChannel = notificationManager.getNotificationChannel(channelId);
+            if(notificationChannel == null){
+                int importance = NotificationManager.IMPORTANCE_HIGH;
+                notificationChannel = new NotificationChannel(channelId, channelDescription, importance);
+                notificationChannel.setLightColor(Color.GREEN);
+                notificationChannel.enableVibration(true);
+                notificationManager.createNotificationChannel(notificationChannel);
+            }
+        }
+    }
+
+    // Check do not disturb permissions, and activate
+    void startNotifBlock(){
+        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if(!notificationManager.isNotificationPolicyAccessGranted()){
+            Toast.makeText(MainActivity.this, "Please activate Do Not Disturb Access and press Back to return to the application!", Toast.LENGTH_LONG).show();
+            startActivityForResult(new Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS), 0);
+        }
+        else{
+            notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_PRIORITY);
+        }
+    }
+    // Turn off do not disturb
+    void stopNotifBlock(){
+        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL);
+    }
+
+
+    // SPEED CALC FUNCTIONS //
+
+    protected void startLocationUpdates() {
+        // Create the location request to start receiving updates
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(5000);
+        mLocationRequest.setFastestInterval(5000);
+
+        // new Google API SDK v11 uses getFusedLocationProviderClient(this)
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION},REQUEST_LOCATION);
+            return;
+        }
+
+        getFusedLocationProviderClient(this).requestLocationUpdates(mLocationRequest, new LocationCallback() {
+                    @Override
+                    public void onLocationResult(LocationResult locationResult) {
+                        // do work here
+                        currentLocation = locationResult.getLastLocation();
+                        onLocationChanged(locationResult.getLastLocation());
+                    }
+                },
+                Looper.myLooper());
+    }
+
+    public void onLocationChanged(Location location) {
+        // New location has now been determined
+        String msg = "Updated Location: " +
+                Double.toString(location.getLatitude()) + "," +
+                Double.toString(location.getLongitude());
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                if (currentLocation != null) {
+                    prevLocation = currentLocation;
+                    prevTime = prevLocation.getTime();
+                }
+                if (prevLocation != null) {
+                    prevLocation2 = prevLocation;
+                    prevTime2 = prevLocation2.getTime();
+                }
+            }
+        };
+
+        Handler h = new Handler();
+        h.postDelayed(r, 50);
+
+
+        currentTime = currentLocation.getTime();
+        longitude.setText(Double.toString(currentLocation.getLongitude()));
+        latitude.setText(Double.toString(currentLocation.getLatitude()));
+
+        if (prevLocation2 != null) {
+            float distance = prevLocation.distanceTo(currentLocation);
+            float distance2 = prevLocation2.distanceTo(prevLocation);
+            float avgDistance = (distance + distance2)/2;
+            distanceTV.setText(Float.toString(distance));
+            //long timeDifference = currentTime - prevTime;
+            double speed = ((avgDistance/1000) / 0.00277777778);
+            speedTV.setText(Double.toString(speed));
+        }
+        // You can now create a LatLng Object for use with maps
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startLocationUpdates();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        startLocationUpdates();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
     }
 }
