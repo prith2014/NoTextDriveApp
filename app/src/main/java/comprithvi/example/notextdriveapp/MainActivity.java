@@ -41,6 +41,7 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 public class MainActivity extends AppCompatActivity {
 
     // Variables for bluetooth
+    //test
     String selectedDeviceName;
     String selectedDeviceAddress;
 
