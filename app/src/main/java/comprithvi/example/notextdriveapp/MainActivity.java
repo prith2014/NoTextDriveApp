@@ -9,6 +9,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import android.Manifest;
 import android.app.Notification;
@@ -41,9 +47,10 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 public class MainActivity extends AppCompatActivity {
 
     // Variables for bluetooth
-    //test
     String selectedDeviceName;
     String selectedDeviceAddress;
+    TextView bluetoothName;
+    TextView bluetoothAddress;
 
     // Variables for notification blocking
     private NotificationManager notificationManager;
@@ -66,6 +73,30 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // BLUETOOTH //
+
+        bluetoothName = findViewById(R.id.bluetoothName);
+        bluetoothAddress = findViewById(R.id.bluetoothAddress);
+
+        Button startService = findViewById(R.id.startService);
+        startService.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchBRService();
+            }
+        });
+
+        Button stopService = findViewById(R.id.stopService);
+        stopService.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopBRService();
+            }
+        });
+
+        // Display selected bluetooth device
+        readFromFile(this);
 
         // SPEED CALCULATION //
         prevLocation = null;
@@ -116,13 +147,20 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    // BLUETOOTH FUNCTIONS //
+    //----------------------- BLUETOOTH FUNCTIONS ----------------------------------------//
 
     // Launch a service in the background that will look for the car's bluetooth signal
     public void launchBRService() {
         Intent intent = new Intent(this, BroadcastReceiverService.class);
         intent.putExtra("foo", "bar");
+        intent.putExtra(selectedDeviceAddress, "address");
         startService(intent);
+    }
+
+    // Stop background service
+    public void stopBRService() {
+        Intent intent = new Intent(this, BroadcastReceiverService.class);
+        stopService(intent);
     }
 
     // Setup button --  Goes to activity to allow the user to pick the car's bluetooth signal
@@ -133,18 +171,52 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if (resultCode == Intent_Constants.INTENT_RESULT_CODE) {
-
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (resultCode == Intent_Constants.INTENT_RESULT_CODE && intent != null) {
             // Setup activity completed, get device name and address
             Bundle extras = intent.getExtras();
             assert extras != null;
             selectedDeviceName = extras.getString("EXTRA_DEVICENAME");
             selectedDeviceAddress = extras.getString("EXTRA_DEVICEADDRESS");
+            readFromFile(this);
 
         }
     }
 
-    // NOTIFICATION FUNCTIONS //
+    // Read from Bluetooth text file
+    public void readFromFile(Context context) {
+        // String is "bluetooth Device name + '\n' + bluetooth Device Address"
+        ArrayList<String> readStrings = new ArrayList<>();
+        String receivedString = "";
+        int x = 0;
+
+        try {
+            InputStream inputStream = context.openFileInput("bluetoothData.txt");
+
+            if (inputStream != null) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                while ((receivedString = bufferedReader.readLine()) != null) {
+                    readStrings.add(receivedString);
+                }
+
+                inputStream.close();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            Toast.makeText(getBaseContext(), "File Not Found", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        selectedDeviceName = readStrings.get(0);
+        selectedDeviceAddress = readStrings.get(1);
+        bluetoothName.setText(selectedDeviceName);
+        bluetoothAddress.setText(selectedDeviceAddress);
+    }
+
+    //-------------------------------- NOTIFICATION FUNCTIONS --------------------------------//
 
     // Function to send a notification
     void postNotification(String title, String text){
@@ -188,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    // SPEED CALC FUNCTIONS //
+    //--------------------------- SPEED CALC FUNCTIONS ---------------------------------------//
 
     protected void startLocationUpdates() {
         // Create the location request to start receiving updates

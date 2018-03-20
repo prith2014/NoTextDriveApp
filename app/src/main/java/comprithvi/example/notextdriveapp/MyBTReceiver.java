@@ -13,9 +13,11 @@ import static android.content.ContentValues.TAG;
 
 /**
  * Created by Prithvi V on 2/20/2018.
+ * In case we need to create a custom Broadcast Receiver
  */
 
 public class MyBTReceiver extends BroadcastReceiver {
+    BroadcastReceiver mReceiver;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -25,5 +27,27 @@ public class MyBTReceiver extends BroadcastReceiver {
             builder.setTitle("Bluetooth found")
             .show();
         }
+
+        // Tejas Code
+        /*
+        String action = intent.getAction();
+        registerReceiver(mReceiver, filter);
+
+        if (BluetoothDevice.ACTION_FOUND.equals(action)){
+            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+
+            if (device.getAddress().equals(address)) {
+
+                if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
+                    //Device is now connected
+                    Log.v(TAG, "YEAH BLUETOOTH CONNECTED !!!!!!");
+                } else if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) {
+                    //Device is about to disconnect
+                } else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
+                    //Device has disconnected
+                    Log.v(TAG, "YEAH BLUETOOTH DISCONNECTED !!!!!!");
+                }
+            }
+        }*/
     }
 }

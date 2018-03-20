@@ -14,7 +14,11 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,10 +59,12 @@ public class SetupActivity extends AppCompatActivity {
                 //Set<String> bluetooth = selectedBTHashMap.keySet();
                 String selectedDeviceName = pairedDevicesListNames.get(position);
                 String selectedDeviceAddress = selectedBTHashMap.get(selectedDeviceName);
+                String bluetoothToTxt = (selectedDeviceName + '\n' + selectedDeviceAddress);
 
                 // Write Device name and address to text file
-                writeToFile(selectedDeviceName, getApplicationContext());
-                writeToFile(selectedDeviceAddress, getApplicationContext());
+                //writeToFile(selectedDeviceName, getApplicationContext());
+                //writeToFile(selectedDeviceAddress, getApplicationContext());
+                writeToFile(bluetoothToTxt, getApplicationContext());
 
                 // Go back to main activity
                 Intent intent = new Intent(SetupActivity.this, MainActivity.class);
@@ -79,7 +85,7 @@ public class SetupActivity extends AppCompatActivity {
     public void writeToFile(String data, Context context) {
 
         try {
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("bluetoothData.txt", Context.MODE_APPEND));
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("bluetoothData.txt", Context.MODE_PRIVATE));
             outputStreamWriter.write(data);
             outputStreamWriter.close();
 
