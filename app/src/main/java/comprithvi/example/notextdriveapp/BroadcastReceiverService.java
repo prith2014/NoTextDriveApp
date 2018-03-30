@@ -1,11 +1,14 @@
 package comprithvi.example.notextdriveapp;
 
 import android.app.IntentService;
+import android.app.Service;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 /**
@@ -14,41 +17,31 @@ import android.util.Log;
  * Not working
  */
 
-public class BroadcastReceiverService extends IntentService {
+public class BroadcastReceiverService extends Service {
     private static final String TAG = "myApp";
     BroadcastReceiver mReceiver;
     IntentFilter filter;
 
-    public BroadcastReceiverService() {
-        super("Blue-service");
-    }
-
     @Override
     public void onCreate() {
         super.onCreate();
-        filter = new IntentFilter();
-        filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
-        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
-        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
-        registerReceiver(mReceiver, filter);
     }
 
     @Override
-    protected void onHandleIntent(Intent workIntent) {
-        // What happens when service is triggered
-        // Gets data from incoming Intent
-        String dataString = workIntent.getDataString();
-        final String address = workIntent.getStringExtra("address");
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.v(TAG, "Service in onStartCommand");
+        final String blueToothAddress = intent.getStringExtra("address");
 
         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
 
-                if (BluetoothDevice.ACTION_FOUND.equals(action)){
+                if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                    Log.v(TAG, "Bluetooth Connection has been found in service");
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
-                    if (device.getAddress().equals(address)) {
+                    if (device.getAddress().equals(blueToothAddress)) {
 
                         if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
                             //Device is now connected
@@ -64,16 +57,19 @@ public class BroadcastReceiverService extends IntentService {
             }
 
         };
+
+
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        // Do not forget to unregister the receiver!!!
-        try {
-            this.unregisterReceiver(this.mReceiver);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

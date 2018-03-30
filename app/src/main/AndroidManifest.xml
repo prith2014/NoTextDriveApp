@@ -25,8 +25,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service
-            android:name=".BroadcastReceiverService"/>
+        <service android:name=".BroadcastReceiverService" />
         <receiver android:name="MyBTReceiver">
             <intent-filter>
                 <action android:name="android.bluetooth.BluetoothDevice.ACTION_ACL_CONNECTED" />

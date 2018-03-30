@@ -152,7 +152,6 @@ public class MainActivity extends AppCompatActivity {
     // Launch a service in the background that will look for the car's bluetooth signal
     public void launchBRService() {
         Intent intent = new Intent(this, BroadcastReceiverService.class);
-        intent.putExtra("foo", "bar");
         intent.putExtra(selectedDeviceAddress, "address");
         startService(intent);
     }
