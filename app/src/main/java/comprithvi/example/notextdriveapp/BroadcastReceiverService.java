@@ -9,6 +9,14 @@ import android.content.IntentFilter;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.Toast;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 /**
  * Created by Prithvi V on 2/19/2018.
@@ -58,16 +66,46 @@ public class BroadcastReceiverService extends Service {
         filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
         this.registerReceiver(mReceiver, filter);
 
-        Intent intent2 = new Intent();
-        blueToothAddress = intent2.getStringExtra("address");
+        //Intent intent2 = new Intent();
+        //blueToothAddress = intent2.getStringExtra("address");
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.v(TAG, "Service in onStartCommand");
-        blueToothAddress = intent.getStringExtra("address");
+        //blueToothAddress = intent.getStringExtra("address");
+        readFromFile(this);
 
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    public void readFromFile(Context context) {
+        // String is "bluetooth Device name + '\n' + bluetooth Device Address"
+        ArrayList<String> readStrings = new ArrayList<>();
+        String receivedString = "";
+        int x = 0;
+
+        try {
+            InputStream inputStream = context.openFileInput("bluetoothData.txt");
+
+            if (inputStream != null) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                while ((receivedString = bufferedReader.readLine()) != null) {
+                    readStrings.add(receivedString);
+                }
+
+                inputStream.close();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            Toast.makeText(getBaseContext(), "File Not Found", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        blueToothAddress = readStrings.get(1);
     }
 
 
