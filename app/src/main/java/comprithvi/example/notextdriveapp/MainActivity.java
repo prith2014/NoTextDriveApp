@@ -1,6 +1,9 @@
 package comprithvi.example.notextdriveapp;
 
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.Location;
 import android.os.Handler;
 import android.os.Looper;
@@ -45,7 +48,7 @@ import com.google.android.gms.location.LocationResult;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 public class MainActivity extends AppCompatActivity {
-
+    private static final String TAG = "myApp";
     // Variables for bluetooth
     String selectedDeviceName;
     String selectedDeviceAddress;
@@ -75,7 +78,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // BLUETOOTH //
-
+/*
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+        this.registerReceiver(mReceiver, filter);
+*/
         bluetoothName = findViewById(R.id.bluetoothName);
         bluetoothAddress = findViewById(R.id.bluetoothAddress);
 
@@ -148,6 +157,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //----------------------- BLUETOOTH FUNCTIONS ----------------------------------------//
+    /*
+    public final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.v(TAG, "Broadcast Receiver onReceive function was called");
+            String action = intent.getAction();
+
+            //if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+            Log.v(TAG, "Bluetooth Connection has been found in service");
+            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+
+            if (device.getAddress().equals(bluetoothAddress)) {
+
+                if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
+                    //Device is now connected
+                    Log.v(TAG, "YEAH BLUETOOTH CONNECTED !!!!!!");
+                } else if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) {
+                    //Device is about to disconnect
+                } else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
+                    //Device has disconnected
+                    Log.v(TAG, "YEAH BLUETOOTH DISCONNECTED !!!!!!");
+                }
+            }
+            //}
+        }
+
+    };*/
 
     // Launch a service in the background that will look for the car's bluetooth signal
     public void launchBRService() {

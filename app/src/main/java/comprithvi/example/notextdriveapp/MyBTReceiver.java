@@ -18,7 +18,8 @@ import static android.content.ContentValues.TAG;
 
 public class MyBTReceiver extends BroadcastReceiver {
     BroadcastReceiver mReceiver;
-
+    String blueToothAddress;
+    /*
     @Override
     public void onReceive(Context context, Intent intent) {
         if (Objects.equals(intent.getAction(), "android.bluetooth.BluetoothDevice.ACTION_ACL_CONNECTED")) {
@@ -27,27 +28,28 @@ public class MyBTReceiver extends BroadcastReceiver {
             builder.setTitle("Bluetooth found")
             .show();
         }
-
-        // Tejas Code
-        /*
+    }*/
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        Log.v(TAG, "Boardcast Receiver onReceive function was called");
         String action = intent.getAction();
-        registerReceiver(mReceiver, filter);
 
-        if (BluetoothDevice.ACTION_FOUND.equals(action)){
-            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+        //if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+        Log.v(TAG, "Bluetooth Connection has been found in service");
+        BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
-            if (device.getAddress().equals(address)) {
+        if (device.getAddress().equals(blueToothAddress)) {
 
-                if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
-                    //Device is now connected
-                    Log.v(TAG, "YEAH BLUETOOTH CONNECTED !!!!!!");
-                } else if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) {
-                    //Device is about to disconnect
-                } else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
-                    //Device has disconnected
-                    Log.v(TAG, "YEAH BLUETOOTH DISCONNECTED !!!!!!");
-                }
+            if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
+                //Device is now connected
+                Log.v(TAG, "YEAH BLUETOOTH CONNECTED !!!!!!");
+            } else if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) {
+                //Device is about to disconnect
+            } else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
+                //Device has disconnected
+                Log.v(TAG, "YEAH BLUETOOTH DISCONNECTED !!!!!!");
             }
-        }*/
+        }
+        //}
     }
 }

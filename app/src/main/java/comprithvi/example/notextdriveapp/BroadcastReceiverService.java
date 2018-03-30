@@ -1,6 +1,5 @@
 package comprithvi.example.notextdriveapp;
 
-import android.app.IntentService;
 import android.app.Service;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -19,48 +18,58 @@ import android.util.Log;
 
 public class BroadcastReceiverService extends Service {
     private static final String TAG = "myApp";
-    BroadcastReceiver mReceiver;
+    String blueToothAddress;
     IntentFilter filter;
+
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.v(TAG, "Broadcast Receiver onReceive function was called");
+            String action = intent.getAction();
+            //Log.v(TAG, action);
+            //Log.v(TAG, BluetoothDevice.ACTION_FOUND);
+            if(blueToothAddress != null) {
+                Log.v(TAG, blueToothAddress);
+            }
+
+            if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
+            Log.v(TAG, "Bluetooth Connection has been found in service");
+            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+
+                if (device.getAddress().equals(blueToothAddress)) {
+                        Log.v(TAG, "YEAH CAR BLUETOOTH CONNECTED !!!!!!");
+                }
+            } else if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) {
+                //Device is about to disconnect
+            } else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
+                //Device has disconnected
+                Log.v(TAG, "YEAH BLUETOOTH DISCONNECTED !!!!!!");
+            }
+        }
+
+    };
 
     @Override
     public void onCreate() {
         super.onCreate();
+        filter = new IntentFilter();
+        filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+        this.registerReceiver(mReceiver, filter);
+
+        Intent intent2 = new Intent();
+        blueToothAddress = intent2.getStringExtra("address");
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.v(TAG, "Service in onStartCommand");
-        final String blueToothAddress = intent.getStringExtra("address");
-
-        mReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-
-                if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                    Log.v(TAG, "Bluetooth Connection has been found in service");
-                    BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-
-                    if (device.getAddress().equals(blueToothAddress)) {
-
-                        if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
-                            //Device is now connected
-                            Log.v(TAG, "YEAH BLUETOOTH CONNECTED !!!!!!");
-                        } else if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) {
-                            //Device is about to disconnect
-                        } else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
-                            //Device has disconnected
-                            Log.v(TAG, "YEAH BLUETOOTH DISCONNECTED !!!!!!");
-                        }
-                    }
-                }
-            }
-
-        };
-
+        blueToothAddress = intent.getStringExtra("address");
 
         return super.onStartCommand(intent, flags, startId);
     }
+
 
     @Nullable
     @Override
@@ -70,6 +79,7 @@ public class BroadcastReceiverService extends Service {
 
     @Override
     public void onDestroy() {
+        Log.v(TAG, "Service is destroyed");
         super.onDestroy();
     }
 }
