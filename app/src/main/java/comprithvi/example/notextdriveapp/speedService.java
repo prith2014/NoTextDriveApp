@@ -1,10 +1,15 @@
 package comprithvi.example.notextdriveapp;
 
 import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -28,6 +33,27 @@ public class speedService extends Service {
     Location currentLocation, prevLocation, prevLocation2;
     LocationRequest mLocationRequest;
     double speed;
+
+    // Variables for notification blocking
+    private NotificationManager notificationManager;
+    private android.app.Notification builder;
+    String channelId = "default_channel_id";
+    String channelDescription = "Default Channel";
+
+    public void onCreate() {
+        Log.v(TAG, "Speed Service in onCreate");
+        super.onCreate();
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.v(TAG, "Speed Service in onStartCommand");
+        startLocationUpdates();
+
+        //checkSpeedAndBlock();
+        //return super.onStartCommand(intent, flags, startId);
+        return START_STICKY;
+    }
 
 
     //-------------------------------Location Functions-----------------------------------------
@@ -54,6 +80,8 @@ public class speedService extends Service {
                         // do work here
                         currentLocation = locationResult.getLastLocation();
                         onLocationChanged(locationResult.getLastLocation());
+
+                        checkSpeedAndBlock();
                     }
                 },
                 Looper.myLooper());
@@ -94,6 +122,68 @@ public class speedService extends Service {
             speed = ((avgDistance/1000) / 0.00277777778);
         }
         // You can now create a LatLng Object for use with maps
+
+        stopSelf();
+        launchSpeedService();
+    }
+
+
+    //------------------------Notification Functions-------------------------
+
+    // Function to send a notification
+    void postNotification(String title, String text){
+        builder = new android.app.Notification.Builder(this, channelId)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setSmallIcon(android.R.drawable.ic_popup_reminder)
+                .build();
+        notificationManager.notify(1, builder);
+    }
+
+    // Function to get the notification channel
+    void create_notification_channel(){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationChannel notificationChannel = notificationManager.getNotificationChannel(channelId);
+            if(notificationChannel == null){
+                int importance = NotificationManager.IMPORTANCE_HIGH;
+                notificationChannel = new NotificationChannel(channelId, channelDescription, importance);
+                notificationChannel.setLightColor(Color.GREEN);
+                notificationChannel.enableVibration(true);
+                notificationManager.createNotificationChannel(notificationChannel);
+            }
+        }
+    }
+
+    // Check do not disturb permissions, and activate
+    void startNotifBlock(){
+        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if(!notificationManager.isNotificationPolicyAccessGranted()){
+            Toast.makeText(this, "Please activate Do Not Disturb Access and press Back to return to the application!", Toast.LENGTH_LONG).show();
+            //startActivityForResult(new Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS), 0);
+        }
+        else{
+            notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_PRIORITY);
+        }
+    }
+    // Turn off do not disturb
+    void stopNotifBlock(){
+        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL);
+    }
+
+    public void checkSpeedAndBlock() {
+        if (speed > 0) {
+            Log.v(TAG, "Notifications are being blocked");
+            startNotifBlock();
+        } else {
+            Log.v(TAG, "Notifications are NOT being blocked");
+            stopNotifBlock();
+        }
+    }
+
+    public void launchSpeedService() {
+        Intent intent = new Intent(this, speedService.class);
+        startService(intent);
     }
 
     @Nullable
@@ -104,7 +194,7 @@ public class speedService extends Service {
 
     @Override
     public void onDestroy() {
-        Log.v(TAG, "Service is destroyed");
+        Log.v(TAG, "Speed Service is destroyed");
         super.onDestroy();
     }
 }

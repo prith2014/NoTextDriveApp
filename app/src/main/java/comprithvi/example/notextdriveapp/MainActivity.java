@@ -273,6 +273,7 @@ public class MainActivity extends AppCompatActivity {
 
     //--------------------------- SPEED CALC FUNCTIONS ---------------------------------------//
 
+    /*
     protected void startLocationUpdates() {
         // Create the location request to start receiving updates
         mLocationRequest = new LocationRequest();
@@ -302,10 +303,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void onLocationChanged(Location location) {
         // New location has now been determined
-        String msg = "Updated Location: " +
-                Double.toString(location.getLatitude()) + "," +
-                Double.toString(location.getLongitude());
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+
+        //String msg = "Updated Location: " +
+        //        Double.toString(location.getLatitude()) + "," +
+        //        Double.toString(location.getLongitude());
+        //Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
 
         Runnable r = new Runnable() {
             @Override
@@ -357,4 +359,5 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
     }
+    */
 }

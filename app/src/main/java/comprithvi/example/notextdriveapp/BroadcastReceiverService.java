@@ -67,6 +67,7 @@ public class BroadcastReceiverService extends Service {
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+
             Log.v(TAG, "Broadcast Receiver onReceive function was called");
             String action = intent.getAction();
             //Log.v(TAG, action);
@@ -82,7 +83,7 @@ public class BroadcastReceiverService extends Service {
                 if (device.getAddress().equals(blueToothAddress)) {
                     // Car bluetooth is connected, time to measure speed/use accelerometer
                     Log.v(TAG, "YEAH CAR BLUETOOTH CONNECTED !!!!!!");
-
+                    launchSpeedService();
                 }
             }
             if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) {
@@ -93,7 +94,52 @@ public class BroadcastReceiverService extends Service {
                 Log.v(TAG, "YEAH BLUETOOTH DISCONNECTED !!!!!!");
             }
 
+
+            stopSelf();
             launchBRService();
+
+            /*
+            new Thread(new Runnable(){
+                public void run() {
+                    while(true)
+                    {
+                        try {
+                            Thread.sleep(5000);
+                            Log.v(TAG, "Broadcast Receiver onReceive function was called");
+                            String action = intent.getAction();
+                            //Log.v(TAG, action);
+                            //Log.v(TAG, BluetoothDevice.ACTION_FOUND);
+                            if (blueToothAddress != null) {
+                                Log.v(TAG, blueToothAddress);
+                            }
+
+                            if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
+                                Log.v(TAG, "Bluetooth Connection has been found in service");
+                                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+
+                                if (device.getAddress().equals(blueToothAddress)) {
+                                    // Car bluetooth is connected, time to measure speed/use accelerometer
+                                    Log.v(TAG, "YEAH CAR BLUETOOTH CONNECTED !!!!!!");
+                                    launchSpeedService();
+                                }
+                            }
+                            if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) {
+                                //Device is about to disconnect
+                            }
+                            if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
+                                //Device has disconnected
+                                Log.v(TAG, "YEAH BLUETOOTH DISCONNECTED !!!!!!");
+                            }
+
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+
+                }
+            }).start();
+            */
         }
 
     };
@@ -151,6 +197,17 @@ public class BroadcastReceiverService extends Service {
         Intent intent = new Intent(this, BroadcastReceiverService.class);
         startService(intent);
     }
+
+    public void launchSpeedService() {
+        Intent intent = new Intent(this, speedService.class);
+        startService(intent);
+    }
+
+    public void stopSpeedService() {
+        Intent intent = new Intent(this, speedService.class);
+        stopService(intent);
+    }
+
     /*
     protected void startLocationUpdates() {
         // Create the location request to start receiving updates
@@ -266,6 +323,7 @@ public class BroadcastReceiverService extends Service {
         //DetectedActivity mostProbableActivity = activityResult
     }
 
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -275,6 +333,9 @@ public class BroadcastReceiverService extends Service {
     @Override
     public void onDestroy() {
         Log.v(TAG, "Service is destroyed");
+        unregisterReceiver(mReceiver);
+        stopSpeedService();
+
         super.onDestroy();
     }
 }
