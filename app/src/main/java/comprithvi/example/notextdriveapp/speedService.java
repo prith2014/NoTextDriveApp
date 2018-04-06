@@ -1,6 +1,7 @@
 package comprithvi.example.notextdriveapp;
 
 import android.Manifest;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
@@ -15,6 +16,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -27,18 +29,18 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 public class speedService extends Service {
     private static final String TAG = "myApp";
     private final int REQUEST_LOCATION = 200;
+    String ANDROID_CHANNEL_ID = "default_channel_id_2";
 
     // Speed variables
     long prevTime, currentTime, prevTime2;
     Location currentLocation, prevLocation, prevLocation2;
     LocationRequest mLocationRequest;
     double speed;
+    LocationCallback mLocationCallBack;
 
     // Variables for notification blocking
     private NotificationManager notificationManager;
-    private android.app.Notification builder;
-    String channelId = "default_channel_id";
-    String channelDescription = "Default Channel";
+
 
     public void onCreate() {
         Log.v(TAG, "Speed Service in onCreate");
@@ -48,10 +50,18 @@ public class speedService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.v(TAG, "Speed Service in onStartCommand");
-        startLocationUpdates();
+        //super.onStartCommand(intent, START_STICKY, startId);
 
-        //checkSpeedAndBlock();
-        //return super.onStartCommand(intent, flags, startId);
+        Notification.Builder builder = new Notification.Builder(this, ANDROID_CHANNEL_ID)
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText("Speed Notification")
+                .setAutoCancel(true);
+
+        Notification notification = builder.build();
+        startForeground(1, notification);
+
+
+        startLocationUpdates();
         return START_STICKY;
     }
 
@@ -74,17 +84,19 @@ public class speedService extends Service {
             //ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION},REQUEST_LOCATION);
             return;
         }
-        getFusedLocationProviderClient(this).requestLocationUpdates(mLocationRequest, new LocationCallback() {
-                    @Override
-                    public void onLocationResult(LocationResult locationResult) {
-                        // do work here
-                        currentLocation = locationResult.getLastLocation();
-                        onLocationChanged(locationResult.getLastLocation());
 
-                        checkSpeedAndBlock();
-                    }
-                },
-                Looper.myLooper());
+       mLocationCallBack = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                // do work here
+                currentLocation = locationResult.getLastLocation();
+                onLocationChanged(locationResult.getLastLocation());
+
+                checkSpeedAndBlock();
+            }
+        };
+
+        getFusedLocationProviderClient(this).requestLocationUpdates(mLocationRequest, mLocationCallBack, Looper.myLooper());
     }
 
     public void onLocationChanged(Location location) {
@@ -123,36 +135,12 @@ public class speedService extends Service {
         }
         // You can now create a LatLng Object for use with maps
 
-        stopSelf();
-        launchSpeedService();
+        //stopSelf();
+        //launchSpeedService();
     }
 
 
     //------------------------Notification Functions-------------------------
-
-    // Function to send a notification
-    void postNotification(String title, String text){
-        builder = new android.app.Notification.Builder(this, channelId)
-                .setContentTitle(title)
-                .setContentText(text)
-                .setSmallIcon(android.R.drawable.ic_popup_reminder)
-                .build();
-        notificationManager.notify(1, builder);
-    }
-
-    // Function to get the notification channel
-    void create_notification_channel(){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            NotificationChannel notificationChannel = notificationManager.getNotificationChannel(channelId);
-            if(notificationChannel == null){
-                int importance = NotificationManager.IMPORTANCE_HIGH;
-                notificationChannel = new NotificationChannel(channelId, channelDescription, importance);
-                notificationChannel.setLightColor(Color.GREEN);
-                notificationChannel.enableVibration(true);
-                notificationManager.createNotificationChannel(notificationChannel);
-            }
-        }
-    }
 
     // Check do not disturb permissions, and activate
     void startNotifBlock(){
@@ -195,6 +183,7 @@ public class speedService extends Service {
     @Override
     public void onDestroy() {
         Log.v(TAG, "Speed Service is destroyed");
+        getFusedLocationProviderClient(this).removeLocationUpdates(mLocationCallBack);
         super.onDestroy();
     }
 }

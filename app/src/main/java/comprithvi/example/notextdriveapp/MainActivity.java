@@ -165,7 +165,12 @@ public class MainActivity extends AppCompatActivity {
     public void launchBRService() {
         Intent intent = new Intent(this, BroadcastReceiverService.class);
         intent.putExtra(selectedDeviceAddress, "address");
-        startService(intent);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent);
+        } else
+            startService(intent);
+
     }
 
     // Stop background service
