@@ -1,5 +1,6 @@
 package comprithvi.example.notextdriveapp;
 
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
@@ -46,6 +47,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
+import static comprithvi.example.notextdriveapp.SetupActivity.REQUEST_ENABLE_BT;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "myApp";
@@ -155,6 +157,20 @@ public class MainActivity extends AppCompatActivity {
                         != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION},REQUEST_LOCATION);
             return;
+        }
+
+        // Request Do Not Distrub Access
+        if(!notificationManager.isNotificationPolicyAccessGranted()){
+            Toast.makeText(MainActivity.this, "Please activate Do Not Disturb Access and press Back to return to the application!", Toast.LENGTH_LONG).show();
+            startActivityForResult(new Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS), 0);
+        }
+
+        // Request Bluetooth Permision
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (!mBluetoothAdapter.isEnabled()) {
+            // Ask user to enable bluetooth
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
 
     }
