@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Build;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -37,9 +38,14 @@ public class speedService extends Service {
     LocationRequest mLocationRequest;
     double speed;
     LocationCallback mLocationCallBack;
+    int timeInterval = 5000;
 
     // Variables for notification blocking
     private NotificationManager notificationManager;
+    Boolean counter = false;
+    int timer = 60000;
+    Runnable r;
+    Handler h = new Handler();
 
 
     public void onCreate() {
@@ -70,10 +76,11 @@ public class speedService extends Service {
 
     protected void startLocationUpdates() {
         // Create the location request to start receiving updates
-        mLocationRequest = new LocationRequest();
+        //mLocationRequest = new LocationRequest();
+        mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setInterval(5000);
-        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setInterval(timeInterval);
+        mLocationRequest.setFastestInterval(timeInterval);
 
         // new Google API SDK v11 uses getFusedLocationProviderClient(this)
 
@@ -131,6 +138,7 @@ public class speedService extends Service {
             float distance2 = prevLocation2.distanceTo(prevLocation);
             float avgDistance = (distance + distance2)/2;
             //long timeDifference = currentTime - prevTime;
+            //speed = ((avgDistance/1000) / ((timeInterval/1000)/3600));
             speed = ((avgDistance/1000) / 0.00277777778);
         }
         // You can now create a LatLng Object for use with maps
@@ -160,12 +168,49 @@ public class speedService extends Service {
     }
 
     public void checkSpeedAndBlock() {
-        if (speed > 0) {
+        // Default speed that works is 2
+        //Handler h = new Handler();
+
+        CountDownTimer counterTimer = new CountDownTimer(60000,1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                String seconds = String.valueOf(millisUntilFinished / 1000);
+                Log.v(TAG,"Timer: " + seconds);
+            }
+
+            @Override
+            public void onFinish() {
+                Log.v(TAG, "Notifications are NOT being blocked");
+                stopNotifBlock();
+            }
+        };
+
+        if (speed > 5) {
             Log.v(TAG, "Notifications are being blocked");
+            //h.removeCallbacks(r);
+            h.removeCallbacksAndMessages(r);
+            counter = false;
+            //counterTimer.cancel();
             startNotifBlock();
         } else {
-            Log.v(TAG, "Notifications are NOT being blocked");
-            stopNotifBlock();
+            //Log.v(TAG, "Notifications are NOT being blocked");
+            //stopNotifBlock();
+
+            if (!counter) {
+                Log.v(TAG, "Timer started");
+                counter = true;
+
+                r = new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.v(TAG, "Notifications are NOT being blocked");
+                        stopNotifBlock();
+                    }
+                };
+
+                h.postDelayed(r, 60000);
+                //counterTimer.start();
+            }
         }
     }
 
@@ -184,6 +229,7 @@ public class speedService extends Service {
     public void onDestroy() {
         Log.v(TAG, "Speed Service is destroyed");
         getFusedLocationProviderClient(this).removeLocationUpdates(mLocationCallBack);
+        stopNotifBlock();
         super.onDestroy();
     }
 }

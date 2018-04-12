@@ -60,8 +60,8 @@ public class BroadcastReceiverService extends Service {
 
             Log.v(TAG, "Broadcast Receiver onReceive function was called");
             String action = intent.getAction();
-            //Log.v(TAG, action);
-            //Log.v(TAG, BluetoothDevice.ACTION_FOUND);
+            Log.v(TAG, action);
+            Log.v(TAG, BluetoothDevice.ACTION_FOUND);
             if (blueToothAddress != null) {
                 Log.v(TAG, blueToothAddress);
             }
