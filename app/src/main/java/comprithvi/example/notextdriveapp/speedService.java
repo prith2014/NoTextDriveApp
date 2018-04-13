@@ -11,7 +11,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Build;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -140,11 +139,10 @@ public class speedService extends Service {
             //long timeDifference = currentTime - prevTime;
             //speed = ((avgDistance/1000) / ((timeInterval/1000)/3600));
             speed = ((avgDistance/1000) / 0.00277777778);
+            Log.v(TAG, "Speed: " + String.valueOf(speed));
         }
         // You can now create a LatLng Object for use with maps
 
-        //stopSelf();
-        //launchSpeedService();
     }
 
 
@@ -169,32 +167,12 @@ public class speedService extends Service {
 
     public void checkSpeedAndBlock() {
         // Default speed that works is 2
-        //Handler h = new Handler();
-
-        CountDownTimer counterTimer = new CountDownTimer(60000,1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                String seconds = String.valueOf(millisUntilFinished / 1000);
-                Log.v(TAG,"Timer: " + seconds);
-            }
-
-            @Override
-            public void onFinish() {
-                Log.v(TAG, "Notifications are NOT being blocked");
-                stopNotifBlock();
-            }
-        };
-
         if (speed > 5) {
             Log.v(TAG, "Notifications are being blocked");
-            //h.removeCallbacks(r);
-            h.removeCallbacksAndMessages(r);
+            h.removeCallbacksAndMessages(null);     // Cancel timer
             counter = false;
-            //counterTimer.cancel();
-            startNotifBlock();
+            startNotifBlock();          // Turn on DO not Disturb
         } else {
-            //Log.v(TAG, "Notifications are NOT being blocked");
-            //stopNotifBlock();
 
             if (!counter) {
                 Log.v(TAG, "Timer started");
@@ -208,8 +186,7 @@ public class speedService extends Service {
                     }
                 };
 
-                h.postDelayed(r, 60000);
-                //counterTimer.start();
+                h.postDelayed(r, 20000);    // Timer till Do not Disturb turns on
             }
         }
     }
