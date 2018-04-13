@@ -1,10 +1,12 @@
 package comprithvi.example.notextdriveapp;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Handler;
 import android.os.Looper;
@@ -20,6 +22,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
 import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -42,9 +46,19 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.ActivityRecognition;
+import com.google.android.gms.location.ActivityRecognitionClient;
+import com.google.android.gms.location.ActivityTransition;
+import com.google.android.gms.location.ActivityTransitionEvent;
+import com.google.android.gms.location.ActivityTransitionRequest;
+import com.google.android.gms.location.ActivityTransitionResult;
+import com.google.android.gms.location.DetectedActivity;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 import static comprithvi.example.notextdriveapp.SetupActivity.REQUEST_ENABLE_BT;
@@ -68,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
     TextView distanceTV;
     TextView longitude;
     TextView latitude;
+    TextView marker;
     long prevTime, currentTime, prevTime2;
     Location currentLocation, prevLocation, prevLocation2;
     LocationRequest mLocationRequest;
@@ -114,9 +129,30 @@ public class MainActivity extends AppCompatActivity {
         distanceTV = findViewById(R.id.distance);
         longitude = findViewById(R.id.longitude);
         latitude = findViewById(R.id.latitude);
+        marker = findViewById(R.id.blt_marker);
+
+        SharedPreferences sharedPreferences = getPreferences(Context.MODE_PRIVATE);
+        boolean blt_marker = sharedPreferences.getBoolean(getString(R.string.BLT_marker), false);
+
+
+        //-----------CODE THAT DETERMINES WHETHER TO RUN BLUETOOTH OR DETECTEDACTIVITY
+        /*
+        if(!blt_marker){
+            // Detected Activity API active
+            //ActivityRecognitionClient ARC = ActivityRecognition.getClient(getApplicationContext())
+            Intent intent = new Intent(this, detectedActivity.class);
+            startService(intent);
+            marker.setText("FALSE");
+        }
+        else{
+            launchBRService();
+            marker.setText("TRUE");
+        }
+        */
 
         // NOTIFICATION BLOCKING //
 
+        /*
         // Get the notification Channel
         if(notificationManager == null){
             notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -131,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
                 postNotification("Title", "text");
             }
         });
-
+        */
         // Start Notification Blocking
         Button start = findViewById(R.id.start);
         start.setOnClickListener(new View.OnClickListener() {
@@ -147,6 +183,24 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 stopNotifBlock();
+            }
+        });
+
+        Button start1 = findViewById(R.id.startDA);
+        start1.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), detectedActivity.class);
+                startService(intent);
+            }
+        });
+
+        Button start2 = findViewById(R.id.stopDA);
+        start2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), detectedActivity.class);
+                stopService(intent);
             }
         });
 
@@ -173,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
 
-    }
+    }// end onCreate()
 
     //----------------------- BLUETOOTH FUNCTIONS ----------------------------------------//
 
@@ -250,6 +304,7 @@ public class MainActivity extends AppCompatActivity {
 
     //-------------------------------- NOTIFICATION FUNCTIONS --------------------------------//
 
+    /*
     // Function to send a notification
     void postNotification(String title, String text){
         builder = new android.app.Notification.Builder(MainActivity.this, channelId)
@@ -273,6 +328,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+    */
 
     // Check do not disturb permissions, and activate
     void startNotifBlock(){
