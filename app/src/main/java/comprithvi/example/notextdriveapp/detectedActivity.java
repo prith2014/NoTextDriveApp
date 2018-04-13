@@ -64,7 +64,7 @@ public class detectedActivity extends Service{
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.v(TAG, "Broadcast Receiver onReceive function was called");
+            Log.v(TAG, "(Detected activity)Broadcast Receiver onReceive function was called");
 
             if (ActivityTransitionResult.hasResult(intent)) {
                 ActivityTransitionResult result = ActivityTransitionResult.extractResult(intent);

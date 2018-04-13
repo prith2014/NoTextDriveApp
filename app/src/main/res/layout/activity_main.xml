@@ -212,14 +212,26 @@
             style="@android:style/Widget.Holo.Button.Small"
             android:layout_width="143dp"
             android:layout_height="wrap_content"
-            android:text="Start Service" />
+            android:text="Start BLT Service" />
 
         <Button
             android:id="@+id/stopService"
             style="@android:style/Widget.Holo.Button.Small"
             android:layout_width="143dp"
             android:layout_height="wrap_content"
-            android:text="Stop Service" />
+            android:text="Stop BLT Service" />
+
+        <Button
+            android:id="@+id/startDA"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Start DA Api Service" />
+
+        <Button
+            android:id="@+id/stopDA"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Stop DA Api Service" />
 
     </LinearLayout>
 

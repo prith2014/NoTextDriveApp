@@ -135,7 +135,8 @@ public class MainActivity extends AppCompatActivity {
         boolean blt_marker = sharedPreferences.getBoolean(getString(R.string.BLT_marker), false);
 
 
-
+        //-----------CODE THAT DETERMINES WHETHER TO RUN BLUETOOTH OR DETECTEDACTIVITY
+        /*
         if(!blt_marker){
             // Detected Activity API active
             //ActivityRecognitionClient ARC = ActivityRecognition.getClient(getApplicationContext())
@@ -147,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
             launchBRService();
             marker.setText("TRUE");
         }
+        */
 
         // NOTIFICATION BLOCKING //
 
@@ -181,6 +183,24 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 stopNotifBlock();
+            }
+        });
+
+        Button start1 = findViewById(R.id.startDA);
+        start1.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), detectedActivity.class);
+                startService(intent);
+            }
+        });
+
+        Button start2 = findViewById(R.id.stopDA);
+        start2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), detectedActivity.class);
+                stopService(intent);
             }
         });
 
