@@ -1,9 +1,11 @@
 package comprithvi.example.notextdriveapp;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -65,7 +67,7 @@ public class SetupActivity extends AppCompatActivity {
                 //writeToFile(selectedDeviceName, getApplicationContext());
                 //writeToFile(selectedDeviceAddress, getApplicationContext());
                 writeToFile(bluetoothToTxt, getApplicationContext());
-
+                markBluetooth();
                 // Go back to main activity
                 Intent intent = new Intent(SetupActivity.this, MainActivity.class);
                 Bundle extras = new Bundle();
@@ -95,6 +97,14 @@ public class SetupActivity extends AppCompatActivity {
 
         Toast toast = Toast.makeText(this, "Saved to bluetoothData.txt", Toast.LENGTH_LONG);
         toast.show();
+    }
+
+    // Function to mark bluetooth setup has occured
+    public void markBluetooth(){
+        SharedPreferences sharedPreferences = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(getString(R.string.BLT_marker), true);
+        editor.commit();
     }
 
     // Listing Bluetooth devices
