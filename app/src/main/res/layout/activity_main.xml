@@ -7,32 +7,33 @@
     android:gravity="center_vertical"
     xmlns:android="http://schemas.android.com/apk/res/android"
     tools:context="comprithvi.example.notextdriveapp.MainActivity">
-    <LinearLayout
-        android:layout_height="match_parent"
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:orientation="vertical"
+        android:layout_height="317dp"
+        android:layout_weight="1"
         android:gravity="center_vertical"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_weight="1">
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <TextView
                 android:id="@+id/longitudeTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:layout_weight="1"
+                android:gravity="center"
                 android:text="Longitude" />
 
             <TextView
                 android:id="@+id/longitude"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:layout_weight="1"
+                android:gravity="center"
                 android:text="-" />
 
         </LinearLayout>
@@ -46,16 +47,16 @@
                 android:id="@+id/latitudeTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:layout_weight="1"
+                android:gravity="center"
                 android:text="Latitude" />
 
             <TextView
                 android:id="@+id/latitude"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:layout_weight="1"
+                android:gravity="center"
                 android:text="-" />
         </LinearLayout>
 
@@ -63,6 +64,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <TextView
                 android:id="@+id/distanceTitle"
                 android:layout_width="match_parent"
@@ -85,6 +87,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <TextView
                 android:id="@+id/speedTitle"
                 android:layout_width="match_parent"
@@ -106,6 +109,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <TextView
                 android:id="@+id/bluetoothNameTitle"
                 android:layout_width="match_parent"
@@ -127,6 +131,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <TextView
                 android:id="@+id/bluetoothAddressTitle"
                 android:layout_width="match_parent"
@@ -143,6 +148,7 @@
                 android:gravity="center"
                 android:text="-" />
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

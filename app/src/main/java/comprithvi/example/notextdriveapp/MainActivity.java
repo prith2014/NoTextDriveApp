@@ -152,13 +152,13 @@ public class MainActivity extends AppCompatActivity {
 
         // NOTIFICATION BLOCKING //
 
-        /*
+
         // Get the notification Channel
         if(notificationManager == null){
             notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         }
         create_notification_channel();
-
+        /*
         // Send Notification
         Button send = findViewById(R.id.send);
         send.setOnClickListener(new View.OnClickListener() {
@@ -304,7 +304,7 @@ public class MainActivity extends AppCompatActivity {
 
     //-------------------------------- NOTIFICATION FUNCTIONS --------------------------------//
 
-    /*
+
     // Function to send a notification
     void postNotification(String title, String text){
         builder = new android.app.Notification.Builder(MainActivity.this, channelId)
@@ -328,7 +328,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    */
+
 
     // Check do not disturb permissions, and activate
     void startNotifBlock(){

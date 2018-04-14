@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.location.ActivityTransition;
@@ -49,6 +50,7 @@ public class detectedActivity extends Service{
                 new OnSuccessListener() {
                     @Override
                     public void onSuccess(Object o) {
+                        Toast.makeText(getApplicationContext(),"in onSuccessListener", Toast.LENGTH_SHORT).show();
 
                     }
                 });
@@ -65,6 +67,8 @@ public class detectedActivity extends Service{
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.v(TAG, "(Detected activity)Broadcast Receiver onReceive function was called");
+            Toast.makeText(getApplicationContext(),"(Detected activity)Broadcast Receiver onReceive function was called", Toast.LENGTH_SHORT).show();
+
 
             if (ActivityTransitionResult.hasResult(intent)) {
                 ActivityTransitionResult result = ActivityTransitionResult.extractResult(intent);
@@ -72,10 +76,12 @@ public class detectedActivity extends Service{
                     // Do something useful here...
                     if(event.getTransitionType() == ActivityTransition.ACTIVITY_TRANSITION_ENTER && event.getActivityType() == DetectedActivity.IN_VEHICLE){
                         // Person has entered a car
+                        Toast.makeText(getApplicationContext(),"Person has entered car", Toast.LENGTH_SHORT).show();
                         launchSpeedService();
                     }
                     if(event.getTransitionType() == ActivityTransition.ACTIVITY_TRANSITION_EXIT && event.getActivityType() == DetectedActivity.IN_VEHICLE){
                         // Person has exited a car
+                        Toast.makeText(getApplicationContext(),"Person has EXITED CAR", Toast.LENGTH_SHORT).show();
                         stopSpeedService();
                     }
                 }
@@ -100,8 +106,11 @@ public class detectedActivity extends Service{
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
         Log.v(TAG, "detectedActivty in onStartCommand");
+        Toast.makeText(getApplicationContext(),"detectedActivity in onStartCommand", Toast.LENGTH_SHORT).show();
+
         Intent newIntent = new Intent(this, detectedActivity.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, newIntent, 0);
+        //PendingIntent pendingIntent = PendingIntent.getService(this,0,newIntent, 0);
         requestActivityTransitionUpdates(this, pendingIntent);
         return START_STICKY;
     }
