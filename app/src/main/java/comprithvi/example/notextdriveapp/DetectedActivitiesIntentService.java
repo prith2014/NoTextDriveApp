@@ -39,11 +39,11 @@ public class DetectedActivitiesIntentService  extends IntentService {
             if(activity.getType()==DetectedActivity.IN_VEHICLE || activity.getConfidence()>70){
                 // Person is in vehicle with decent confidence
                 Intent intent1 = new Intent(this, speedService.class);
-                startService(intent);
+                startService(intent1);
             }
             else{
-                Intent intent1 = new Intent(this, speedService.class);
-                stopService(intent);
+                Intent intent2 = new Intent(this, speedService.class);
+                stopService(intent2);
             }
             //-----------HERE THE SERVICE FIGURES OUT WHICH ACTIVITY IS OCCURING-----------//
             //broadcastActivity(activity);
