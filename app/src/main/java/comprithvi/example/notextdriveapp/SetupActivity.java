@@ -30,14 +30,13 @@ public class SetupActivity extends AppCompatActivity {
     ArrayAdapter pairedDeviceAdapter;
     ArrayList<HashMap<String,String>> pairedDevicesList;
     ArrayList<String> pairedDevicesListNames;
-    //ArrayAdapter<HashMap<String, String>> pairedDeviceAdapter;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setup);
 
+        // Create array list of bluetooth devices to display
         listPairedBlueToothDevices();
 
         // Show list of paired devices
@@ -46,24 +45,16 @@ public class SetupActivity extends AppCompatActivity {
         pairedDeviceListView.setAdapter(pairedDeviceAdapter);
         pairedDeviceAdapter.notifyDataSetChanged();
 
-        // Show list of paired devices ArrayList Hashmap verison (not pretty)
-        //pairedDeviceListView = findViewById(R.id.pairedDevicesListView);
-        //pairedDeviceAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, pairedDevicesList);
-        //pairedDeviceListView.setAdapter(pairedDeviceAdapter);
-        //pairedDeviceAdapter.notifyDataSetChanged();
-
+        // Person clicks on a bluetooth device in list
         pairedDeviceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 HashMap<String, String> selectedBTHashMap = pairedDevicesList.get(position);
-                //Set<String> bluetooth = selectedBTHashMap.keySet();
                 String selectedDeviceName = pairedDevicesListNames.get(position);
                 String selectedDeviceAddress = selectedBTHashMap.get(selectedDeviceName);
                 String bluetoothToTxt = (selectedDeviceName + '\n' + selectedDeviceAddress);
 
                 // Write Device name and address to text file
-                //writeToFile(selectedDeviceName, getApplicationContext());
-                //writeToFile(selectedDeviceAddress, getApplicationContext());
                 writeToFile(bluetoothToTxt, getApplicationContext());
 
                 // Go back to main activity
@@ -71,9 +62,7 @@ public class SetupActivity extends AppCompatActivity {
                 Bundle extras = new Bundle();
                 extras.putString("EXTRA_DEVICENAME", selectedDeviceName);
                 extras.putString("EXTRA_DEVICEADDRESS", selectedDeviceAddress);
-                //intent.putExtra("map", selectedBTHashMap);
                 intent.putExtras(extras);
-                //startActivity(intent);
                 setResult(Intent_Constants.INTENT_RESULT_CODE, intent);
                 finish();
             }
@@ -81,7 +70,7 @@ public class SetupActivity extends AppCompatActivity {
 
     }
 
-    // Function to write to file
+    // Function to write to txt file
     public void writeToFile(String data, Context context) {
 
         try {
@@ -97,9 +86,8 @@ public class SetupActivity extends AppCompatActivity {
         toast.show();
     }
 
-    // Listing Bluetooth devices
+    // Creates an array list of Bluetooth devices remembered by phone
     public void listPairedBlueToothDevices() {
-
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter != null) {
             // Device does support Bluetooth
@@ -112,8 +100,6 @@ public class SetupActivity extends AppCompatActivity {
 
             Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
             pairedDevicesListNames = new ArrayList<>();
-            //ArrayList<String> pairedDevicesListAddresses = new ArrayList<String>();
-            // make a hash map
             pairedDevicesList = new ArrayList<>();
 
             if (pairedDevices.size() > 0) {
@@ -123,7 +109,6 @@ public class SetupActivity extends AppCompatActivity {
                     String deviceHardwareAddress = device.getAddress(); // MAC address
 
                     pairedDevicesListNames.add(deviceName);
-                    //pairedDevicesListAddresses.add(deviceHardwareAddress);
                     HashMap<String, String> BTpairedDevicesHashes = new HashMap<>();
                     BTpairedDevicesHashes.put(deviceName, deviceHardwareAddress);
                     pairedDevicesList.add(BTpairedDevicesHashes);

@@ -100,6 +100,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        Button softDisable = findViewById(R.id.softDisable);
+        stopService.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopBRService();
+            }
+        });
+
         // Display selected bluetooth device
         readFromFile(this);
 
@@ -173,6 +181,9 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
 
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS, Manifest.permission.SEND_SMS}, 10);
+
     }
 
     //----------------------- BLUETOOTH FUNCTIONS ----------------------------------------//
@@ -193,6 +204,18 @@ public class MainActivity extends AppCompatActivity {
     public void stopBRService() {
         Intent intent = new Intent(this, BroadcastReceiverService.class);
         stopService(intent);
+    }
+
+    // Soft disable
+    public void softDisableBRService() {
+        // stops speed service with a timer
+        Intent intent = new Intent(this, BroadcastReceiverService.class);
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent);
+        } else
+            startService(intent);
     }
 
     // Setup button --  Goes to activity to allow the user to pick the car's bluetooth signal
