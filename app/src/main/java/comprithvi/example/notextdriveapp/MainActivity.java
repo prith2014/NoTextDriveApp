@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         bluetoothName = findViewById(R.id.bluetoothName);
         bluetoothAddress = findViewById(R.id.bluetoothAddress);
 
-        Button startService = findViewById(R.id.startService);
+        final Button startService = findViewById(R.id.startService);
         startService.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button stopService = findViewById(R.id.stopService);
+        final Button stopService = findViewById(R.id.stopService);
         stopService.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -147,6 +147,24 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 stopNotifBlock();
+            }
+        });
+
+        Button startAPI = findViewById(R.id.startAPI);
+        startAPI.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, BackgroundDetectedActivitiesService.class);
+                startService(intent);
+            }
+        });
+
+        Button stopAPI = findViewById(R.id.stopAPI);
+        stopAPI.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, BackgroundDetectedActivitiesService.class);
+                stopService(intent);
             }
         });
 
