@@ -101,10 +101,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         Button softDisable = findViewById(R.id.softDisable);
-        stopService.setOnClickListener(new View.OnClickListener() {
+        softDisable.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stopBRService();
+                softDisableBRService();
             }
         });
 
@@ -167,13 +167,13 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        // Request Do Not Distrub Access
+        // Request Do Not Disturb Access
         if(!notificationManager.isNotificationPolicyAccessGranted()){
             Toast.makeText(MainActivity.this, "Please activate Do Not Disturb Access and press Back to return to the application!", Toast.LENGTH_LONG).show();
             startActivityForResult(new Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS), 0);
         }
 
-        // Request Bluetooth Permision
+        // Request Bluetooth Permission
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (!mBluetoothAdapter.isEnabled()) {
             // Ask user to enable bluetooth
@@ -191,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
     // Launch a service in the background that will look for the car's bluetooth signal
     public void launchBRService() {
         Intent intent = new Intent(this, BroadcastReceiverService.class);
-        intent.putExtra(selectedDeviceAddress, "address");
+        intent.putExtra("address",selectedDeviceAddress);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(intent);
@@ -210,7 +210,8 @@ public class MainActivity extends AppCompatActivity {
     public void softDisableBRService() {
         // stops speed service with a timer
         Intent intent = new Intent(this, BroadcastReceiverService.class);
-
+        Boolean isSoftDisableOn = true;
+        intent.putExtra("softDisable",isSoftDisableOn);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(intent);

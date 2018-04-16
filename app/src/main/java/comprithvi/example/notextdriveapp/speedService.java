@@ -35,6 +35,7 @@ public class speedService extends Service {
     private static final String TAG = "myApp";
     private final int REQUEST_LOCATION = 200;
     String ANDROID_CHANNEL_ID = "default_channel_id_2";
+    IntentFilter filter;
 
     // Speed variables
     long prevTime, currentTime, prevTime2;
@@ -51,7 +52,6 @@ public class speedService extends Service {
     Runnable r;
     Handler h = new Handler();
 
-    IntentFilter filter;
     private final BroadcastReceiver sms = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -102,7 +102,7 @@ public class speedService extends Service {
     }
 
 
-    //-------------------------------Location Functions-----------------------------------------
+    //--------------------------------------------Location Functions-----------------------------------------
 
     protected void startLocationUpdates() {
         // Create the location request to start receiving updates
@@ -177,7 +177,7 @@ public class speedService extends Service {
     }
 
 
-    //------------------------Notification Functions-------------------------
+    //----------------------------------------Notification Functions--------------------------------------
 
     // Check do not disturb permissions, and activate
     void startNotifBlock(){
@@ -222,12 +222,7 @@ public class speedService extends Service {
         }
     }
 
-    public void launchSpeedService() {
-        Intent intent = new Intent(this, speedService.class);
-        startService(intent);
-    }
-
-    //---------------------SMS FUNCTIONS---------------------------------------
+    //---------------------------------------------SMS FUNCTIONS---------------------------------------
 
     public void sendSMS(String phoneNum, String msg) {
         try {
