@@ -228,6 +228,13 @@
             android:text="Stop BLT Service" />
 
         <Button
+            android:id="@+id/softDisable"
+            style="@android:style/Widget.Holo.Button.Small"
+            android:layout_width="143dp"
+            android:layout_height="wrap_content"
+            android:text="Soft Disable" />
+
+        <Button
             android:id="@+id/startDA"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -186,6 +186,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        Button softDisable = findViewById(R.id.softDisable);
+        softDisable.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                softDisableBRService();
+            }
+        });
+
         Button start1 = findViewById(R.id.startDA);
         start1.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -247,6 +255,18 @@ public class MainActivity extends AppCompatActivity {
     public void stopBRService() {
         Intent intent = new Intent(this, BroadcastReceiverService.class);
         stopService(intent);
+    }
+
+    public void softDisableBRService() {
+        // stops speed service with a timer
+        Intent intent = new Intent(this, BroadcastReceiverService.class);
+        Boolean isSoftDisableOn = true;
+        intent.putExtra("softDisable",isSoftDisableOn);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent);
+        } else
+            startService(intent);
     }
 
     // Setup button --  Goes to activity to allow the user to pick the car's bluetooth signal
