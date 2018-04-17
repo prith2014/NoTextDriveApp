@@ -150,6 +150,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        Button startAPI = findViewById(R.id.startAPI);
+        startAPI.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, BackgroundDetectedActivitiesService.class);
+                startService(intent);
+            }
+        });
+
+        Button stopAPI = findViewById(R.id.stopAPI);
+        stopAPI.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, BackgroundDetectedActivitiesService.class);
+                stopService(intent);
+            }
+        });
+
         // Request location permission
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED &&
