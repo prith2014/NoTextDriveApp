@@ -108,4 +108,3 @@ public class BackgroundDetectedActivitiesService extends Service {
         removeActivityUpdatesButtonHandler();
     }
 }
-
