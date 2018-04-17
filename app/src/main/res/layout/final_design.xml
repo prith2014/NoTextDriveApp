@@ -58,12 +58,12 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buffer" />
+        app:layout_constraintTop_toBottomOf="@+id/custom_message" />
 
     <Button
         android:id="@+id/bluetooth_setup"
-        android:layout_width="169dp"
-        android:layout_height="51dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
@@ -88,19 +88,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
 
-    <TextView
-        android:id="@+id/buffer"
-        android:layout_width="wrap_content"
+    <Button
+        android:id="@+id/custom_message"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="64dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
-        android:text="TextView"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/disable_service"
+        android:background="@drawable/button"
+        android:text="Set a custom reply message"
+        android:textColor="@color/blue"
+        android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/message1" />
+        tools:layout_editor_absoluteY="200dp" />
 
 </android.support.constraint.ConstraintLayout>
