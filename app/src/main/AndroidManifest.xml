@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -27,13 +28,7 @@
         </activity>
         <service android:name=".BroadcastReceiverService"/>
         <service android:name=".speedService"/>
-        <receiver android:name="MyBTReceiver">
-            <intent-filter>
-                <action android:name="android.bluetooth.BluetoothDevice.ACTION_ACL_CONNECTED" />
-                <action android:name="android.bluetooth.device.action.ACL_DISCONNECT_REQUESTED" />
-                <action android:name="android.bluetooth.BluetoothDevice.ACTION_ACL_DISCONNECTED" />
-            </intent-filter>
-        </receiver>
+        <service android:name=".BackgroundDetectedActivitiesService"/>
         <activity android:name=".SetupActivity"></activity>
     </application>
 
