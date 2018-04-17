@@ -5,8 +5,10 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -14,9 +16,12 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.provider.Telephony;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
+import android.telephony.SmsManager;
+import android.telephony.SmsMessage;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -30,6 +35,7 @@ public class speedService extends Service {
     private static final String TAG = "myApp";
     private final int REQUEST_LOCATION = 200;
     String ANDROID_CHANNEL_ID = "default_channel_id_2";
+    IntentFilter filter;
 
     // Speed variables
     long prevTime, currentTime, prevTime2;
@@ -46,10 +52,35 @@ public class speedService extends Service {
     Runnable r;
     Handler h = new Handler();
 
+    private final BroadcastReceiver sms = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.v("onReceive", "onReceive was called" );
+            if (intent.getAction().equals(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)) {
+                Log.v("SMS Received", "SMS was received" );
+                String smsSender = "";
+                String smsBody = "";
+                for (SmsMessage smsMessage : Telephony.Sms.Intents.getMessagesFromIntent(intent)) {
+                    smsSender = smsMessage.getDisplayOriginatingAddress();
+                    smsBody += smsMessage.getMessageBody();
+                    Toast.makeText(context, smsSender, Toast.LENGTH_LONG).show();
+
+                    // Sending text back
+                    sendSMS(smsSender, "Test Reply");
+                }
+            }
+        }
+    };
+
 
     public void onCreate() {
         Log.v(TAG, "Speed Service in onCreate");
         super.onCreate();
+
+        filter = new IntentFilter();
+        filter.setPriority(999);
+        filter.addAction(Telephony.Sms.Intents.SMS_RECEIVED_ACTION);
+        registerReceiver(sms, filter);
     }
 
     @Override
@@ -71,7 +102,7 @@ public class speedService extends Service {
     }
 
 
-    //-------------------------------Location Functions-----------------------------------------
+    //--------------------------------------------Location Functions-----------------------------------------
 
     protected void startLocationUpdates() {
         // Create the location request to start receiving updates
@@ -146,7 +177,7 @@ public class speedService extends Service {
     }
 
 
-    //------------------------Notification Functions-------------------------
+    //----------------------------------------Notification Functions--------------------------------------
 
     // Check do not disturb permissions, and activate
     void startNotifBlock(){
@@ -167,7 +198,7 @@ public class speedService extends Service {
 
     public void checkSpeedAndBlock() {
         // Default speed that works is 2
-        if (speed > 5) {
+        if (speed > 0) {
             Log.v(TAG, "Notifications are being blocked");
             h.removeCallbacksAndMessages(null);     // Cancel timer
             counter = false;
@@ -186,14 +217,23 @@ public class speedService extends Service {
                     }
                 };
 
-                h.postDelayed(r, 20000);    // Timer till Do not Disturb turns on
+                h.postDelayed(r, timer);    // Timer till Do not Disturb turns on
             }
         }
     }
 
-    public void launchSpeedService() {
-        Intent intent = new Intent(this, speedService.class);
-        startService(intent);
+    //---------------------------------------------SMS FUNCTIONS---------------------------------------
+
+    public void sendSMS(String phoneNum, String msg) {
+        try {
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(phoneNum, null, msg, null, null);
+            Log.v(TAG, "SMS Message sent");
+        } catch (Exception ex) {
+            Toast.makeText(getApplicationContext(),ex.getMessage().toString(),
+                Toast.LENGTH_LONG).show();
+            ex.printStackTrace();
+        }
     }
 
     @Nullable
@@ -207,6 +247,7 @@ public class speedService extends Service {
         Log.v(TAG, "Speed Service is destroyed");
         getFusedLocationProviderClient(this).removeLocationUpdates(mLocationCallBack);
         stopNotifBlock();
+        unregisterReceiver(sms);
         super.onDestroy();
     }
 }

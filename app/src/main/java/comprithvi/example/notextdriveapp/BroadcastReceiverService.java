@@ -14,6 +14,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -22,13 +23,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
-
-import com.google.android.gms.location.ActivityRecognition;
-import com.google.android.gms.location.ActivityRecognitionResult;
-import com.google.android.gms.location.DetectedActivity;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -47,11 +41,13 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 public class BroadcastReceiverService extends Service {
     private static final String TAG = "myApp";
     private final int REQUEST_LOCATION = 200;
+    int softDisableTimer = 60000;           //milliseconds
     String blueToothAddress;
     IntentFilter filter;
     String ANDROID_CHANNEL_ID = "default_channel_id_2";
 
-    // Variables for Activity Recognition
+    Boolean isSoftDisableOn = false;
+    Boolean isBluetoothConnected = false;
 
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -60,8 +56,8 @@ public class BroadcastReceiverService extends Service {
 
             Log.v(TAG, "Broadcast Receiver onReceive function was called");
             String action = intent.getAction();
-            Log.v(TAG, action);
-            Log.v(TAG, BluetoothDevice.ACTION_FOUND);
+            //Log.v(TAG, action);
+            //Log.v(TAG, BluetoothDevice.ACTION_FOUND);
             if (blueToothAddress != null) {
                 Log.v(TAG, blueToothAddress);
             }
@@ -73,6 +69,7 @@ public class BroadcastReceiverService extends Service {
                 if (device.getAddress().equals(blueToothAddress)) {
                     // Car bluetooth is connected, time to measure speed/use accelerometer
                     Log.v(TAG, "YEAH CAR BLUETOOTH CONNECTED !!!!!!");
+                    isBluetoothConnected = true;
                     launchSpeedService();
                 }
             }
@@ -82,6 +79,7 @@ public class BroadcastReceiverService extends Service {
             if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
                 //Device has disconnected
                 Log.v(TAG, "YEAH BLUETOOTH DISCONNECTED !!!!!!");
+                isBluetoothConnected = false;
                 stopSpeedService();
             }
 
@@ -104,6 +102,12 @@ public class BroadcastReceiverService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.v(TAG, "Service in onStartCommand");
         //blueToothAddress = intent.getStringExtra("address");
+        Bundle args = intent.getExtras();
+
+        if (args != null) {
+            isSoftDisableOn = args.getBoolean("softDisable");
+            //Log.v("TAG", "Boolean value passed into BR service");
+        }
 
         Notification.Builder builder = new Notification.Builder(this, ANDROID_CHANNEL_ID)
                 .setContentTitle(getString(R.string.app_name))
@@ -114,6 +118,10 @@ public class BroadcastReceiverService extends Service {
         startForeground(1, notification);
 
         readFromFile(this);
+
+        if (isSoftDisableOn) {
+            softDisable();
+        }
 
         //return super.onStartCommand(intent, flags, startId);
         return START_STICKY;
@@ -148,11 +156,6 @@ public class BroadcastReceiverService extends Service {
         blueToothAddress = readStrings.get(1);
     }
 
-    public void launchBRService() {
-        Intent intent = new Intent(this, BroadcastReceiverService.class);
-        startService(intent);
-    }
-
     public void launchSpeedService() {
         Intent intent = new Intent(this, speedService.class);
 
@@ -167,14 +170,22 @@ public class BroadcastReceiverService extends Service {
         stopService(intent);
     }
 
-    public void setActivity(Intent intent) {
-        // Get update
-        ActivityRecognitionResult activityRecognitionResult = ActivityRecognitionResult.extractResult(intent);
+    public void softDisable() {
+        // Disables speed service for one minute
+        Log.v("TAG", "Soft Disable is stopping speed service");
+        stopSpeedService();
 
-        // Get most probable activity from list
-        //DetectedActivity mostProbableActivity = activityResult
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                Log.v(TAG, "Soft Disable is over, restarting speed service");
+                isSoftDisableOn = false;
+                launchSpeedService();
+            }
+        };
+        Handler h = new Handler();
+        h.postDelayed(r, softDisableTimer);    // Timer till Do not Disturb turns on
     }
-
 
     @Nullable
     @Override
