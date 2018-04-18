@@ -102,9 +102,15 @@ public class BackgroundDetectedActivitiesService extends Service {
         });
     }
 
+    public void stopSpeedService() {
+        Intent intent = new Intent(this, speedService.class);
+        stopService(intent);
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         removeActivityUpdatesButtonHandler();
+        stopSpeedService();
     }
 }
