@@ -36,7 +36,7 @@ public class DetectedActivitiesIntentService  extends IntentService {
 
         for (DetectedActivity activity : detectedActivities) {
             Log.i(TAG, "Detected activity: " + activity.getType() + ", " + activity.getConfidence());
-            if(activity.getType()==DetectedActivity.IN_VEHICLE || activity.getConfidence()>70){
+            if(activity.getType()==DetectedActivity.IN_VEHICLE && activity.getConfidence()>70){
                 // Person is in vehicle with decent confidence
                 Intent intent1 = new Intent(this, speedService.class);
                 startService(intent1);
