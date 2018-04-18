@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#84CEEB</color>
-    <color name="colorPrimaryDark">#C1C8E4</color>
+    <color name="colorPrimary">#FF9800</color>
+    <color name="colorPrimaryDark">#00004d</color>
+    <color name="colorExtra">#424242</color>
+    <color name="colorOrange">#FF9800</color>
+    <color name="pink">#ff3a33</color>
+    <color name="white">#ffffff</color>
     <color name="blue">#153b9e</color>
     <color name="lightblue">#84CEEB</color>
     <color name="aquablue">#5AB9EA</color>
