@@ -19,7 +19,7 @@ public class BackgroundDetectedActivitiesService extends Service {
 
     private Intent mIntentService;
     private PendingIntent mPendingIntent;
-    private ActivityRecognitionClient mActivityRecognitionClient;
+    public ActivityRecognitionClient mActivityRecognitionClient;
 
     IBinder mBinder = new BackgroundDetectedActivitiesService.LocalBinder();
 
