@@ -43,7 +43,8 @@ public class speedService extends Service {
     LocationRequest mLocationRequest;
     double speed;
     LocationCallback mLocationCallBack;
-    int timeInterval = 5000;
+    long timeInterval = 5000;
+    double timeIntervalDouble = (double) timeInterval;
 
     // Variables for notification blocking
     private NotificationManager notificationManager;
@@ -51,6 +52,8 @@ public class speedService extends Service {
     int timer = 60000;
     Runnable r;
     Handler h = new Handler();
+    double speedMin = 8.04;     // 5 MPH
+    //double speedMin = 3.2198688;     // 2 MPH
 
     private final BroadcastReceiver sms = new BroadcastReceiver() {
         @Override
@@ -168,9 +171,12 @@ public class speedService extends Service {
             float distance2 = prevLocation2.distanceTo(prevLocation);
             float avgDistance = (distance + distance2)/2;
             //long timeDifference = currentTime - prevTime;
-            //speed = ((avgDistance/1000) / ((timeInterval/1000)/3600));
-            speed = ((avgDistance/1000) / 0.00277777778);
+            //double testing = ((timeIntervalDouble/1000)/3600);
+            speed = ((avgDistance/1000) / ((timeIntervalDouble/1000)/3600));
+            //speed = ((avgDistance/1000) / 0.00277777778);
+            //speed = ((avgDistance/1000) / 0.0013888888889);
             Log.v(TAG, "Speed: " + String.valueOf(speed));
+            //Log.v(TAG, "Testing: " + String.valueOf(testing));
         }
         // You can now create a LatLng Object for use with maps
 

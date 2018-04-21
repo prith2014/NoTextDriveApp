@@ -7,33 +7,32 @@
     android:gravity="center_vertical"
     xmlns:android="http://schemas.android.com/apk/res/android"
     tools:context="comprithvi.example.notextdriveapp.MainActivity">
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
+        android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:layout_height="398dp"
-        android:layout_weight="1"
+        android:orientation="vertical"
         android:gravity="center_vertical"
-        android:orientation="vertical">
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_weight="1">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-
             <TextView
                 android:id="@+id/longitudeTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:gravity="center"
+                android:layout_weight="1"
                 android:text="Longitude" />
 
             <TextView
                 android:id="@+id/longitude"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:gravity="center"
+                android:layout_weight="1"
                 android:text="-" />
 
         </LinearLayout>
@@ -47,16 +46,16 @@
                 android:id="@+id/latitudeTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:gravity="center"
+                android:layout_weight="1"
                 android:text="Latitude" />
 
             <TextView
                 android:id="@+id/latitude"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:gravity="center"
+                android:layout_weight="1"
                 android:text="-" />
         </LinearLayout>
 
@@ -64,7 +63,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-
             <TextView
                 android:id="@+id/distanceTitle"
                 android:layout_width="match_parent"
@@ -87,7 +85,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-
             <TextView
                 android:id="@+id/speedTitle"
                 android:layout_width="match_parent"
@@ -109,7 +106,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-
             <TextView
                 android:id="@+id/bluetoothNameTitle"
                 android:layout_width="match_parent"
@@ -131,7 +127,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-
             <TextView
                 android:id="@+id/bluetoothAddressTitle"
                 android:layout_width="match_parent"
@@ -154,63 +149,83 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:orientation="vertical">
+        android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/button"
-            style="@android:style/Widget.Holo.Button.Small"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@android:color/holo_blue_dark"
-            android:onClick="setupButton"
-            android:text="@string/setup" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/start"
-            style="@android:style/Widget.Holo.Button.Small"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@android:color/holo_blue_dark"
-            android:text="@string/start_button" />
+            <Button
+                android:id="@+id/button"
+                style="@android:style/Widget.Holo.Button.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@android:color/holo_blue_dark"
+                android:onClick="setupButton"
+                android:text="@string/setup" />
 
-        <Button
-            android:id="@+id/stop"
-            style="@android:style/Widget.Holo.Button.Small"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@android:color/holo_blue_dark"
-            android:text="@string/stop_button" />
+            <Button
+                android:id="@+id/start"
+                style="@android:style/Widget.Holo.Button.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@android:color/holo_blue_dark"
+                android:text="@string/start_button" />
 
-        <Button
-            android:id="@+id/send"
-            style="@android:style/Widget.Holo.Button.Small"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@android:color/holo_blue_dark"
-            android:text="@string/send_button" />
+            <Button
+                android:id="@+id/stop"
+                style="@android:style/Widget.Holo.Button.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@android:color/holo_blue_dark"
+                android:text="@string/stop_button" />
 
-        <Button
-            android:id="@+id/startService"
-            style="@android:style/Widget.Holo.Button.Small"
-            android:layout_width="143dp"
-            android:layout_height="wrap_content"
-            android:text="Start Service" />
+            <Button
+                android:id="@+id/send"
+                style="@android:style/Widget.Holo.Button.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@android:color/holo_blue_dark"
+                android:text="@string/send_button" />
 
-        <Button
-        android:id="@+id/stopService"
-        style="@android:style/Widget.Holo.Button.Small"
-        android:layout_width="143dp"
-        android:layout_height="wrap_content"
-        android:text="Stop Service" />
+            <Button
+                android:id="@+id/startService"
+                style="@android:style/Widget.Holo.Button.Small"
+                android:layout_width="143dp"
+                android:layout_height="wrap_content"
+                android:text="Start Service" />
 
-        <Button
-            android:id="@+id/softDisable"
-            style="@android:style/Widget.Holo.Button.Small"
-            android:layout_width="143dp"
-            android:layout_height="wrap_content"
-            android:text="Soft Disable" />
+            <Button
+                android:id="@+id/stopService"
+                style="@android:style/Widget.Holo.Button.Small"
+                android:layout_width="143dp"
+                android:layout_height="wrap_content"
+                android:text="Stop Service" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/startAPI"
+                android:text="Start DA API Service"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/stopAPI"
+                android:text="Stop DA API Service"/>
+
+        </LinearLayout>
 
     </LinearLayout>
-
 
 </LinearLayout>
