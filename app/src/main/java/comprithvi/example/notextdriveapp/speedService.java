@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -89,7 +90,10 @@ public class speedService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.v(TAG, "Speed Service in onStartCommand");
-        //super.onStartCommand(intent, START_STICKY, startId);
+        SharedPreferences prefs = this.getSharedPreferences("userdetails", Context.MODE_PRIVATE);
+        final SharedPreferences.Editor editPrefs = prefs.edit();
+
+        editPrefs.putBoolean("userdetails.isSpeedServiceOn", true);
 
         Notification.Builder builder = new Notification.Builder(this, ANDROID_CHANNEL_ID)
                 .setContentTitle(getString(R.string.app_name))
@@ -204,6 +208,7 @@ public class speedService extends Service {
 
     public void checkSpeedAndBlock() {
         // Default speed that works is 2
+
         if (speed > 0) {
             Log.v(TAG, "Notifications are being blocked");
             h.removeCallbacksAndMessages(null);     // Cancel timer
@@ -254,6 +259,12 @@ public class speedService extends Service {
         getFusedLocationProviderClient(this).removeLocationUpdates(mLocationCallBack);
         stopNotifBlock();
         unregisterReceiver(sms);
+
+        SharedPreferences prefs = this.getSharedPreferences("userdetails", Context.MODE_PRIVATE);
+        final SharedPreferences.Editor editPrefs = prefs.edit();
+
+        editPrefs.putBoolean("userdetails.isSpeedServiceOn", false);
+
         super.onDestroy();
     }
 }

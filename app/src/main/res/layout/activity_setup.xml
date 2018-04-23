@@ -9,8 +9,10 @@
     <ListView
         android:id="@+id/pairedDevicesListView"
         android:layout_width="395dp"
-        android:layout_height="520dp"
+        android:layout_height="518dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
@@ -20,10 +22,11 @@
         android:layout_width="376dp"
         android:layout_height="39dp"
         android:layout_marginTop="8dp"
-        android:text="Select the car's bluetooth signal"
+        android:text="@string/select_the_car_s_bluetooth_signal"
         android:textAppearance="@android:style/TextAppearance.Material.Large"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 </android.support.constraint.ConstraintLayout>

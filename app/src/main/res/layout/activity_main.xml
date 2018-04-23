@@ -209,20 +209,52 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:orientation="vertical">
 
             <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:id="@+id/startAPI"
-                android:text="Start DA API Service"/>
-
-            <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="Start DA API Service" />
+
+            <Button
                 android:id="@+id/stopAPI"
-                android:text="Stop DA API Service"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Stop DA API Service" />
+
+            <TextView
+                android:id="@+id/textView_softdisable"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/soft_disable_timer"
+                android:textAppearance="@android:style/TextAppearance.Material.Large"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/spinner_softdisable"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintVertical_bias="0.436" />
+
+            <Spinner
+                android:id="@+id/spinner_softdisable"
+                android:layout_width="167dp"
+                android:layout_height="28dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <Button
+                android:id="@+id/button_softdisable"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Soft Disable" />
 
         </LinearLayout>
 

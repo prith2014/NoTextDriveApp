@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,7 +36,6 @@ public class SetupActivity extends AppCompatActivity {
     ArrayAdapter pairedDeviceAdapter;
     ArrayList<HashMap<String,String>> pairedDevicesList;
     ArrayList<String> pairedDevicesListNames;
-    //ArrayAdapter<HashMap<String, String>> pairedDeviceAdapter;
 
 
     @Override

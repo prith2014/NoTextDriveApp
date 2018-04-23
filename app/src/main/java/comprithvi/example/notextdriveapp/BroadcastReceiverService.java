@@ -10,6 +10,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -29,6 +30,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
@@ -41,13 +43,14 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 public class BroadcastReceiverService extends Service {
     private static final String TAG = "myApp";
     private final int REQUEST_LOCATION = 200;
-    int softDisableTimer = 60000;           //milliseconds
+    int softDisableTimer;           //milliseconds
     String blueToothAddress;
     IntentFilter filter;
     String ANDROID_CHANNEL_ID = "default_channel_id_2";
 
-    Boolean isSoftDisableOn = false;
+    Boolean isSoftDisableOn;
     Boolean isBluetoothConnected = false;
+    Boolean isSpeedServiceOn;
 
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -104,10 +107,16 @@ public class BroadcastReceiverService extends Service {
         //blueToothAddress = intent.getStringExtra("address");
         Bundle args = intent.getExtras();
 
-        if (args != null) {
-            isSoftDisableOn = args.getBoolean("softDisable");
-            //Log.v("TAG", "Boolean value passed into BR service");
-        }
+        SharedPreferences prefs = this.getSharedPreferences("userdetails", Context.MODE_PRIVATE);
+        final SharedPreferences.Editor editPrefs = prefs.edit();
+        editPrefs.putBoolean("userdetails.isBroadcastServiceOn", true);
+
+        isSoftDisableOn = prefs.getBoolean("userdetails.isSoftDisableOn",false);
+        softDisableTimer = prefs.getInt("userdetails.softDisableTimer", 60000*30);
+        isSpeedServiceOn = prefs.getBoolean("userdetails.isSpeedServiceOn", false);
+
+        Log.v(TAG, "boolean soft disable " + isSoftDisableOn);
+        Log.v(TAG, "soft disable timer " + softDisableTimer);
 
         Notification.Builder builder = new Notification.Builder(this, ANDROID_CHANNEL_ID)
                 .setContentTitle(getString(R.string.app_name))
@@ -119,7 +128,7 @@ public class BroadcastReceiverService extends Service {
 
         readFromFile(this);
 
-        if (isSoftDisableOn) {
+        if (isSoftDisableOn && isSpeedServiceOn) {
             softDisable();
         }
 
@@ -172,6 +181,9 @@ public class BroadcastReceiverService extends Service {
 
     public void softDisable() {
         // Disables speed service for one minute
+        SharedPreferences prefs = this.getSharedPreferences("userdetails", Context.MODE_PRIVATE);
+        final SharedPreferences.Editor editPrefs = prefs.edit();
+
         Log.v("TAG", "Soft Disable is stopping speed service");
         stopSpeedService();
 
@@ -180,6 +192,10 @@ public class BroadcastReceiverService extends Service {
             public void run() {
                 Log.v(TAG, "Soft Disable is over, restarting speed service");
                 isSoftDisableOn = false;
+                editPrefs.putBoolean("userdetails.isSoftDisableOn", isSoftDisableOn);
+                //String softDisableString = String.valueOf(isSoftDisableOn) + '\n' + String.valueOf(softDisableTimer);
+                //writeToFileSoftDisable(softDisableString, getApplicationContext());
+
                 launchSpeedService();
             }
         };
@@ -198,6 +214,10 @@ public class BroadcastReceiverService extends Service {
         Log.v(TAG, "Service is destroyed");
         unregisterReceiver(mReceiver);
         stopSpeedService();
+
+        SharedPreferences prefs = this.getSharedPreferences("userdetails", Context.MODE_PRIVATE);
+        final SharedPreferences.Editor editPrefs = prefs.edit();
+        editPrefs.putBoolean("userdetails.isBroadcastServiceOn", false);
 
         super.onDestroy();
     }

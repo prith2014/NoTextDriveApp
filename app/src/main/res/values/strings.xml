@@ -6,4 +6,6 @@
     <string name="send_button">Send Notification</string>
     <string name="setup">Setup BT</string>
     <string name="BLT_marker">bluetooth</string>
+    <string name="select_the_car_s_bluetooth_signal">Select the car\'s bluetooth signal</string>
+    <string name="soft_disable_timer">Soft Disable Timer</string>
 </resources>
