@@ -223,7 +223,8 @@ public class MainActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 switch (position) {
                     case 0:
-                        softDisableTimer = 60000*30;
+                        //softDisableTimer = 60000*30;
+                        softDisableTimer = 30000;
                         editPrefs.putInt("userdetails.softDisableTimer", softDisableTimer).apply();
                         break;
                     case 1:
@@ -250,9 +251,11 @@ public class MainActivity extends AppCompatActivity {
         softDisable.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                //Log.v(TAG, "" + prefs.getBoolean("userdetails.isSpeedServiceOn", false));
+                Log.v(TAG, "Soft Disable button has been pressed by user");
                 if (prefs.getBoolean("userdetails.isSpeedServiceOn", false)) {
                     isSoftDisableOn = true;
+
                     editPrefs.putBoolean("userdetails.isSoftDisableOn", isSoftDisableOn).apply();
                     launchBRService();
                 }

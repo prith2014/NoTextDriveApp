@@ -71,9 +71,11 @@ public class BroadcastReceiverService extends Service {
 
                 if (device.getAddress().equals(blueToothAddress)) {
                     // Car bluetooth is connected, time to measure speed/use accelerometer
-                    Log.v(TAG, "YEAH CAR BLUETOOTH CONNECTED !!!!!!");
+                    Log.v(TAG, "Car Bluetooth has been connected");
                     isBluetoothConnected = true;
-                    launchSpeedService();
+
+                    if (!isSoftDisableOn)
+                        launchSpeedService();
                 }
             }
             if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) {
@@ -81,7 +83,7 @@ public class BroadcastReceiverService extends Service {
             }
             if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
                 //Device has disconnected
-                Log.v(TAG, "YEAH BLUETOOTH DISCONNECTED !!!!!!");
+                Log.v(TAG, "Car Bluetooth has been disconnected");
                 isBluetoothConnected = false;
                 stopSpeedService();
             }
@@ -103,7 +105,7 @@ public class BroadcastReceiverService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.v(TAG, "Service in onStartCommand");
+        Log.v(TAG, "Bluetooth Service in onStartCommand");
         //blueToothAddress = intent.getStringExtra("address");
         Bundle args = intent.getExtras();
 
@@ -115,8 +117,8 @@ public class BroadcastReceiverService extends Service {
         softDisableTimer = prefs.getInt("userdetails.softDisableTimer", 60000*30);
         isSpeedServiceOn = prefs.getBoolean("userdetails.isSpeedServiceOn", false);
 
-        Log.v(TAG, "boolean soft disable " + isSoftDisableOn);
-        Log.v(TAG, "soft disable timer " + softDisableTimer);
+        //Log.v(TAG, "boolean soft disable " + isSoftDisableOn);
+        //Log.v(TAG, "soft disable timer " + softDisableTimer);
 
         Notification.Builder builder = new Notification.Builder(this, ANDROID_CHANNEL_ID)
                 .setContentTitle(getString(R.string.app_name))
@@ -211,7 +213,7 @@ public class BroadcastReceiverService extends Service {
 
     @Override
     public void onDestroy() {
-        Log.v(TAG, "Service is destroyed");
+        Log.v(TAG, "Bluetooth Service is destroyed");
         unregisterReceiver(mReceiver);
         stopSpeedService();
 

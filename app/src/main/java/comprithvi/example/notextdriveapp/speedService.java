@@ -93,8 +93,8 @@ public class speedService extends Service {
         SharedPreferences prefs = this.getSharedPreferences("userdetails", Context.MODE_PRIVATE);
         final SharedPreferences.Editor editPrefs = prefs.edit();
 
-        editPrefs.putBoolean("userdetails.isSpeedServiceOn", true);
-
+        editPrefs.putBoolean("userdetails.isSpeedServiceOn", true).apply();
+        //Log.v(TAG, "" + prefs.getBoolean("userdetails.isSpeedServiceOn", false));
         Notification.Builder builder = new Notification.Builder(this, ANDROID_CHANNEL_ID)
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText("Speed Notification")
@@ -263,7 +263,7 @@ public class speedService extends Service {
         SharedPreferences prefs = this.getSharedPreferences("userdetails", Context.MODE_PRIVATE);
         final SharedPreferences.Editor editPrefs = prefs.edit();
 
-        editPrefs.putBoolean("userdetails.isSpeedServiceOn", false);
+        editPrefs.putBoolean("userdetails.isSpeedServiceOn", false).apply();
 
         super.onDestroy();
     }
