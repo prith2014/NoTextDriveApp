@@ -55,6 +55,10 @@ public class speedService extends Service {
     Handler h = new Handler();
     double speedMin = 8.04;     // 5 MPH
     //double speedMin = 3.2198688;     // 2 MPH
+    String customReplyMessage = "";
+
+    final SharedPreferences prefs = this.getSharedPreferences("userdetails", Context.MODE_PRIVATE);
+    final SharedPreferences.Editor editPrefs = prefs.edit();
 
     private final BroadcastReceiver sms = new BroadcastReceiver() {
         @Override
@@ -70,7 +74,8 @@ public class speedService extends Service {
                     Toast.makeText(context, smsSender, Toast.LENGTH_LONG).show();
 
                     // Sending text back
-                    sendSMS(smsSender, "Test Reply");
+                    if (prefs.getBoolean("userdetails.isSMSOn", false))
+                        sendSMS(smsSender, customReplyMessage);
                 }
             }
         }
@@ -94,6 +99,7 @@ public class speedService extends Service {
         final SharedPreferences.Editor editPrefs = prefs.edit();
 
         editPrefs.putBoolean("userdetails.isSpeedServiceOn", true).apply();
+        customReplyMessage = prefs.getString("userdetails.customReplyMessage","Sorry, I'm currently driving");
         //Log.v(TAG, "" + prefs.getBoolean("userdetails.isSpeedServiceOn", false));
         Notification.Builder builder = new Notification.Builder(this, ANDROID_CHANNEL_ID)
                 .setContentTitle(getString(R.string.app_name))

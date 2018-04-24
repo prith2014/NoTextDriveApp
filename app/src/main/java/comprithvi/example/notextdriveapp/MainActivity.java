@@ -1,8 +1,10 @@
 package comprithvi.example.notextdriveapp;
 
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -12,6 +14,7 @@ import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 
 import java.io.BufferedReader;
@@ -41,12 +44,17 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -65,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
     String softDisableOptions[] = {"30 Minutes","1 Hour", "2 Hours"};
     int softDisableTimer;    // defaults to 30
     Boolean isSoftDisableOn = false;
-    //String softDisableString;
+    String customReplyMessage;
 
     // Variables for notification blocking
     private NotificationManager notificationManager;
@@ -87,41 +95,166 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.final_design);
         final SharedPreferences prefs = this.getSharedPreferences("userdetails", Context.MODE_PRIVATE);
         final SharedPreferences.Editor editPrefs = prefs.edit();
-        editPrefs.putBoolean("userdetails.isSoftDisableOn", false);
+        //editPrefs.putBoolean("userdetails.isSoftDisableOn", false);
+
+        // BUTTONS //
+        Button bluetoothSetupButton = findViewById(R.id.button_bluetoothsetup);
+        bluetoothSetupButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), SetupActivity.class);
+                startActivityForResult(intent, Intent_Constants.INTENT_REQUEST_CODE);
+            }
+        });
+
+        final Button customReplyButton = findViewById(R.id.button);
+        customReplyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+                builder.setTitle("Set Custom Auto-Reply Message");
+
+                View viewInflated = LayoutInflater.from(getApplicationContext()).inflate(R.layout.text_input, (ViewGroup) findViewById(android.R.id.content), false);
+
+                final EditText input = viewInflated.findViewById(R.id.input);
+                builder.setView(viewInflated);
+
+                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        customReplyMessage = input.getText().toString();
+                        editPrefs.putString("userdetails.customReplyMessage",customReplyMessage).apply();
+                    }
+                });
+
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+            }
+        });
+
+        final AlertDialog.Builder builderSpinner = new AlertDialog.Builder(this);
+        builderSpinner.setTitle("Select Disable Time");
+        builderSpinner.setItems(softDisableOptions, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int position) {
+                dialog.dismiss();
+                switch (position) {
+                    case 0:
+                        //softDisableTimer = 60000*30;
+                        softDisableTimer = 30000;
+                        editPrefs.putInt("userdetails.softDisableTimer", softDisableTimer).apply();
+                        break;
+                    case 1:
+                        softDisableTimer = 60000*60;
+                        editPrefs.putInt("userdetails.softDisableTimer", softDisableTimer).apply();
+                        break;
+                    case 2:
+                        softDisableTimer = 60000*120;
+                        editPrefs.putInt("userdetails.softDisableTimer", softDisableTimer).apply();
+                        break;
+                    default:
+                        editPrefs.putInt("userdetails.softDisableTimer", 60000*30).apply();
+                        break;
+                }
+            }
+
+        });
+
+        Button softDisable = findViewById(R.id.button2);
+        softDisable.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //Log.v(TAG, "" + prefs.getBoolean("userdetails.isSpeedServiceOn", false));
+                Log.v(TAG, "Soft Disable button has been pressed by user");
+
+                builderSpinner.show();
+
+                if (prefs.getBoolean("userdetails.isSpeedServiceOn", false)) {
+                    isSoftDisableOn = true;
+
+                    editPrefs.putBoolean("userdetails.isSoftDisableOn", isSoftDisableOn).apply();
+                    launchBRService();
+                }
+
+            }
+        });
+
+        final ToggleButton startService = findViewById(R.id.serviceEnabled);
+        startService.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    if (prefs.getBoolean("userdetails.userIsUsingBluetooth", false))
+                        launchBRService();
+                    else {
+                        Intent intent = new Intent(MainActivity.this, BackgroundDetectedActivitiesService.class);
+                        startService(intent);
+                    }
+                } else {
+                    if (prefs.getBoolean("userdetails.userIsUsingBluetooth", false))
+                        stopBRService();
+                    else {
+                        Intent intent = new Intent(MainActivity.this, BackgroundDetectedActivitiesService.class);
+                        stopService(intent);
+                    }
+                }
+            }
+        });
+
+        Switch bluetoothSwitch = findViewById(R.id.switch1);
+        bluetoothSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    // stop detected API service first
+                    Intent intent = new Intent(MainActivity.this, BackgroundDetectedActivitiesService.class);
+                    stopService(intent);
+                    startService.setChecked(false);
+                    editPrefs.putBoolean("userdetails.userIsUsingBluetooth", true).apply();
+                } else {
+                    // stop bluetooth service first
+                    stopBRService();
+                    startService.setChecked(false);
+                    editPrefs.putBoolean("userdetails.userIsUsingBluetooth", false).apply();
+                }
+            }
+        });
+
+        Switch autoReplySwitch = findViewById(R.id.switch2);
+        autoReplySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    // turn on auto reply
+                    editPrefs.putBoolean("userdetails.isSMSOn",true).apply();
+                } else {
+                    // turn off auto reply
+                    editPrefs.putBoolean("userdetails.isSMSOn",false).apply();
+                }
+            }
+        });
 
         // BLUETOOTH //
 
         bluetoothName = findViewById(R.id.bluetoothName);
         bluetoothAddress = findViewById(R.id.bluetoothAddress);
 
-        Button startService = findViewById(R.id.startService);
-        startService.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                launchBRService();
-            }
-        });
-
-        Button stopService = findViewById(R.id.stopService);
-        stopService.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                stopBRService();
-            }
-        });
 
         // Display selected bluetooth device
         File btFile = new File(getApplicationContext().getFilesDir(),"bluetoothData.txt");
         if (btFile.exists())
             readFromFile(this);
 
-        // Read selected soft disable setting
-        //File softDisableFile = new File(getApplicationContext().getFilesDir(),"softDisableData.txt");
-        //if (softDisableFile.exists())
-        //    readFromFileSoftDisable(this);
 
         // SPEED CALCULATION //
         prevLocation = null;
@@ -142,7 +275,7 @@ public class MainActivity extends AppCompatActivity {
             notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         }
         create_notification_channel();
-
+        /*
         // Send Notification
         Button send = findViewById(R.id.send);
         send.setOnClickListener(new View.OnClickListener() {
@@ -187,7 +320,7 @@ public class MainActivity extends AppCompatActivity {
                 stopService(intent);
             }
         });
-
+        */
         // Request location permission
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED &&
@@ -214,6 +347,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Soft Disable Spinner
+        /*
         Spinner softDisableSpinner = findViewById(R.id.spinner_softdisable);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, softDisableOptions);
         adapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
@@ -246,22 +380,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
-        Button softDisable = findViewById(R.id.button_softdisable);
-        softDisable.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //Log.v(TAG, "" + prefs.getBoolean("userdetails.isSpeedServiceOn", false));
-                Log.v(TAG, "Soft Disable button has been pressed by user");
-                if (prefs.getBoolean("userdetails.isSpeedServiceOn", false)) {
-                    isSoftDisableOn = true;
-
-                    editPrefs.putBoolean("userdetails.isSoftDisableOn", isSoftDisableOn).apply();
-                    launchBRService();
-                }
-
-            }
-        });
+        */
 
     }
 
@@ -334,8 +453,8 @@ public class MainActivity extends AppCompatActivity {
 
         selectedDeviceName = readStrings.get(0);
         selectedDeviceAddress = readStrings.get(1);
-        bluetoothName.setText(selectedDeviceName);
-        bluetoothAddress.setText(selectedDeviceAddress);
+        //bluetoothName.setText(selectedDeviceName);
+        //bluetoothAddress.setText(selectedDeviceAddress);
     }
 
     //-------------------------------- NOTIFICATION FUNCTIONS --------------------------------//
