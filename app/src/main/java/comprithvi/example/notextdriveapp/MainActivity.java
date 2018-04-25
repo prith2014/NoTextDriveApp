@@ -257,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
                 if (!(prefs.getBoolean("userdetails.isSoftDisableOn", false))) {
                     builderSpinner.show();
                 } else {
-                    editPrefs.putBoolean("userdetails.isSoftDisableOn", false);
+                    editPrefs.putBoolean("userdetails.isSoftDisableOn", false).apply();
                     launchBRService();
                 }
 

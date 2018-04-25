@@ -126,7 +126,7 @@ public class BroadcastReceiverService extends Service {
         softDisableTimer = prefs.getInt("userdetails.softDisableTimer", 60000*30);
         isSpeedServiceOn = prefs.getBoolean("userdetails.isSpeedServiceOn", false);
 
-        //Log.v(TAG, "boolean soft disable " + isSoftDisableOn);
+        Log.v(TAG, "boolean soft disable " + isSoftDisableOn);
         //Log.v(TAG, "soft disable timer " + softDisableTimer);
 
         Notification.Builder builder = new Notification.Builder(this, ANDROID_CHANNEL_ID)
