@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -50,6 +51,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -98,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.final_design);
         final SharedPreferences prefs = this.getSharedPreferences("userdetails", Context.MODE_PRIVATE);
         final SharedPreferences.Editor editPrefs = prefs.edit();
-        //editPrefs.putBoolean("userdetails.isSoftDisableOn", false);
+        editPrefs.putBoolean("userdetails.isSoftDisableOn", false).apply();
 
         // BUTTONS //
         Button bluetoothSetupButton = findViewById(R.id.button_bluetoothsetup);
@@ -110,17 +112,51 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        /*
+        final AlertDialog.Builder alert = new AlertDialog.Builder(getApplicationContext());
+        alert.setTitle("Set Custom Auto-Reply Message");
+        alert.setMessage("Message");
+
+        // Set an EditText view to get user input
+        final EditText input = new EditText(getApplicationContext());
+        alert.setView(input);
+
+        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // Do something with value!
+                dialog.dismiss();
+                customReplyMessage = input.getText().toString();
+                editPrefs.putString("userdetails.customReplyMessage",customReplyMessage).apply();
+            }
+        });
+
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // Canceled.
+                dialog.cancel();
+            }
+        });
+        */
         final Button customReplyButton = findViewById(R.id.button);
         customReplyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
-                builder.setTitle("Set Custom Auto-Reply Message");
 
-                View viewInflated = LayoutInflater.from(getApplicationContext()).inflate(R.layout.text_input, (ViewGroup) findViewById(android.R.id.content), false);
+                final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Auto-Reply");
+                builder.setMessage("Set Custom Auto-Reply Message");
 
-                final EditText input = viewInflated.findViewById(R.id.input);
-                builder.setView(viewInflated);
+                //View viewInflated = LayoutInflater.from(getApplicationContext()).inflate(R.layout.text_input, (ViewGroup) findViewById(android.R.id.content), false);
+
+                //final EditText input = viewInflated.findViewById(R.id.input);
+                //builder.setView(viewInflated);
+
+                final EditText input = new EditText(MainActivity.this);
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT);
+                input.setLayoutParams(lp);
+                builder.setView(input);
 
                 builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
@@ -138,6 +174,15 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
+                new Handler().postDelayed(new Runnable(){
+
+                    public void run() {
+                        builder.show();
+                    }
+
+                }, 200L);
+                //builder.show();
+                //alert.show();
             }
         });
 
@@ -153,17 +198,49 @@ public class MainActivity extends AppCompatActivity {
                         //softDisableTimer = 60000*30;
                         softDisableTimer = 30000;
                         editPrefs.putInt("userdetails.softDisableTimer", softDisableTimer).apply();
+
+                        if (prefs.getBoolean("userdetails.isSpeedServiceOn", false)) {
+                            isSoftDisableOn = true;
+
+                            editPrefs.putBoolean("userdetails.isSoftDisableOn", isSoftDisableOn).apply();
+                            launchBRService();
+                        }
+
                         break;
                     case 1:
                         softDisableTimer = 60000*60;
                         editPrefs.putInt("userdetails.softDisableTimer", softDisableTimer).apply();
+
+                        if (prefs.getBoolean("userdetails.isSpeedServiceOn", false)) {
+                            isSoftDisableOn = true;
+
+                            editPrefs.putBoolean("userdetails.isSoftDisableOn", isSoftDisableOn).apply();
+                            launchBRService();
+                        }
+
                         break;
                     case 2:
                         softDisableTimer = 60000*120;
                         editPrefs.putInt("userdetails.softDisableTimer", softDisableTimer).apply();
+
+                        if (prefs.getBoolean("userdetails.isSpeedServiceOn", false)) {
+                            isSoftDisableOn = true;
+
+                            editPrefs.putBoolean("userdetails.isSoftDisableOn", isSoftDisableOn).apply();
+                            launchBRService();
+                        }
+
                         break;
                     default:
                         editPrefs.putInt("userdetails.softDisableTimer", 60000*30).apply();
+
+                        if (prefs.getBoolean("userdetails.isSpeedServiceOn", false)) {
+                            isSoftDisableOn = true;
+
+                            editPrefs.putBoolean("userdetails.isSoftDisableOn", isSoftDisableOn).apply();
+                            launchBRService();
+                        }
+
                         break;
                 }
             }
@@ -177,14 +254,13 @@ public class MainActivity extends AppCompatActivity {
                 //Log.v(TAG, "" + prefs.getBoolean("userdetails.isSpeedServiceOn", false));
                 Log.v(TAG, "Soft Disable button has been pressed by user");
 
-                builderSpinner.show();
-
-                if (prefs.getBoolean("userdetails.isSpeedServiceOn", false)) {
-                    isSoftDisableOn = true;
-
-                    editPrefs.putBoolean("userdetails.isSoftDisableOn", isSoftDisableOn).apply();
+                if (!(prefs.getBoolean("userdetails.isSoftDisableOn", false))) {
+                    builderSpinner.show();
+                } else {
+                    editPrefs.putBoolean("userdetails.isSoftDisableOn", false);
                     launchBRService();
                 }
+
 
             }
         });
@@ -344,6 +420,22 @@ public class MainActivity extends AppCompatActivity {
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
             }
+        }
+
+        String permission = Manifest.permission.RECEIVE_SMS;
+        int grant = ContextCompat.checkSelfPermission(this, permission);
+        if ( grant != PackageManager.PERMISSION_GRANTED) {
+            String[] permission_list = new String[1];
+            permission_list[0] = permission;
+            ActivityCompat.requestPermissions(this, permission_list, 1);
+        }
+
+        String permission2 = Manifest.permission.SEND_SMS;
+        int grant2 = ContextCompat.checkSelfPermission(this, permission2);
+        if ( grant2 != PackageManager.PERMISSION_GRANTED) {
+            String[] permission_list = new String[1];
+            permission_list[0] = permission2;
+            ActivityCompat.requestPermissions(this, permission_list, 1);
         }
 
         // Soft Disable Spinner

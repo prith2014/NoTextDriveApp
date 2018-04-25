@@ -56,14 +56,13 @@ public class speedService extends Service {
     double speedMin = 8.04;     // 5 MPH
     //double speedMin = 3.2198688;     // 2 MPH
     String customReplyMessage = "";
-
-    final SharedPreferences prefs = this.getSharedPreferences("userdetails", Context.MODE_PRIVATE);
-    final SharedPreferences.Editor editPrefs = prefs.edit();
+    Boolean isAutoReplyOn;
 
     private final BroadcastReceiver sms = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.v("onReceive", "onReceive was called" );
+            Log.v("onReceive", "SMS onReceive was called" );
+
             if (intent.getAction().equals(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)) {
                 Log.v("SMS Received", "SMS was received" );
                 String smsSender = "";
@@ -74,7 +73,7 @@ public class speedService extends Service {
                     Toast.makeText(context, smsSender, Toast.LENGTH_LONG).show();
 
                     // Sending text back
-                    if (prefs.getBoolean("userdetails.isSMSOn", false))
+                    if (isAutoReplyOn)
                         sendSMS(smsSender, customReplyMessage);
                 }
             }
@@ -100,7 +99,11 @@ public class speedService extends Service {
 
         editPrefs.putBoolean("userdetails.isSpeedServiceOn", true).apply();
         customReplyMessage = prefs.getString("userdetails.customReplyMessage","Sorry, I'm currently driving");
+        isAutoReplyOn = prefs.getBoolean("userdetails.isSMSOn",false);
+
         //Log.v(TAG, "" + prefs.getBoolean("userdetails.isSpeedServiceOn", false));
+        Log.v(TAG, "Is SMS on" + isAutoReplyOn);
+        Log.v(TAG, "Message: " + customReplyMessage);
         Notification.Builder builder = new Notification.Builder(this, ANDROID_CHANNEL_ID)
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText("Speed Notification")
@@ -243,6 +246,7 @@ public class speedService extends Service {
 
     public void sendSMS(String phoneNum, String msg) {
         try {
+            Log.v("Auto Reply", "sendSMS function called" );
             SmsManager smsManager = SmsManager.getDefault();
             smsManager.sendTextMessage(phoneNum, null, msg, null, null);
             Log.v(TAG, "SMS Message sent");

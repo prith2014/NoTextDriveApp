@@ -5,7 +5,10 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
+import android.bluetooth.BluetoothA2dp;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothProfile;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -51,6 +54,8 @@ public class BroadcastReceiverService extends Service {
     Boolean isSoftDisableOn;
     Boolean isBluetoothConnected = false;
     Boolean isSpeedServiceOn;
+    Handler h;
+    Boolean softDisableRunning = false;
 
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -64,6 +69,7 @@ public class BroadcastReceiverService extends Service {
             if (blueToothAddress != null) {
                 Log.v(TAG, blueToothAddress);
             }
+            BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 
             if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
                 Log.v(TAG, "Bluetooth Connection has been found in service");
@@ -74,8 +80,11 @@ public class BroadcastReceiverService extends Service {
                     Log.v(TAG, "Car Bluetooth has been connected");
                     isBluetoothConnected = true;
 
-                    if (!isSoftDisableOn)
-                        launchSpeedService();
+                    //if ( adapter.getProfileConnectionState(BluetoothProfile.HEADSET) == BluetoothProfile.STATE_CONNECTED) {
+                    //if ( adapter.getProfileConnectionState(BluetoothProfile.A2DP) == BluetoothProfile.STATE_CONNECTED) {
+                        if (!isSoftDisableOn)
+                            launchSpeedService();
+
                 }
             }
             if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) {
@@ -130,6 +139,12 @@ public class BroadcastReceiverService extends Service {
 
         readFromFile(this);
 
+        if (!isSoftDisableOn && softDisableRunning) {
+            h.removeCallbacksAndMessages(null);
+
+            if (isBluetoothConnected)
+                launchSpeedService();
+        }
         if (isSoftDisableOn && isSpeedServiceOn) {
             softDisable();
         }
@@ -187,6 +202,7 @@ public class BroadcastReceiverService extends Service {
         final SharedPreferences.Editor editPrefs = prefs.edit();
 
         Log.v("TAG", "Soft Disable is stopping speed service");
+        softDisableRunning = true;
         stopSpeedService();
 
         Runnable r = new Runnable() {
@@ -194,14 +210,17 @@ public class BroadcastReceiverService extends Service {
             public void run() {
                 Log.v(TAG, "Soft Disable is over, restarting speed service");
                 isSoftDisableOn = false;
+                softDisableRunning = false;
                 editPrefs.putBoolean("userdetails.isSoftDisableOn", isSoftDisableOn);
                 //String softDisableString = String.valueOf(isSoftDisableOn) + '\n' + String.valueOf(softDisableTimer);
                 //writeToFileSoftDisable(softDisableString, getApplicationContext());
+                //BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 
-                launchSpeedService();
+                //if ( adapter.getProfileConnectionState(BluetoothProfile.A2DP) == BluetoothProfile.STATE_CONNECTED)
+                    launchSpeedService();
             }
         };
-        Handler h = new Handler();
+        h = new Handler();
         h.postDelayed(r, softDisableTimer);    // Timer till Do not Disturb turns on
     }
 
