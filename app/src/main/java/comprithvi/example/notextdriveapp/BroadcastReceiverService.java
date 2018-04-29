@@ -78,6 +78,8 @@ public class BroadcastReceiverService extends Service {
                 if (device.getAddress().equals(blueToothAddress)) {
                     // Car bluetooth is connected, time to measure speed/use accelerometer
                     Log.v(TAG, "Car Bluetooth has been connected");
+                    Toast.makeText(getApplicationContext(), "Car Bluetooth has been connected", Toast.LENGTH_SHORT).show();
+
                     isBluetoothConnected = true;
 
                     //if ( adapter.getProfileConnectionState(BluetoothProfile.HEADSET) == BluetoothProfile.STATE_CONNECTED) {
@@ -115,6 +117,7 @@ public class BroadcastReceiverService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.v(TAG, "Bluetooth Service in onStartCommand");
+        Toast.makeText(this, "Bluetooth Service has started", Toast.LENGTH_SHORT).show();
         //blueToothAddress = intent.getStringExtra("address");
         Bundle args = intent.getExtras();
 
@@ -233,6 +236,7 @@ public class BroadcastReceiverService extends Service {
     @Override
     public void onDestroy() {
         Log.v(TAG, "Bluetooth Service is destroyed");
+        Toast.makeText(this, "Bluetooth Service is destroyed", Toast.LENGTH_SHORT).show();
         unregisterReceiver(mReceiver);
         stopSpeedService();
 

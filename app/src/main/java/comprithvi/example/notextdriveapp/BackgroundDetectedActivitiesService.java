@@ -81,6 +81,7 @@ public class BackgroundDetectedActivitiesService extends Service {
     }
 
     public void removeActivityUpdatesButtonHandler() {
+        stopSpeedService();
         Task<Void> task = mActivityRecognitionClient.removeActivityUpdates(
                 mPendingIntent);
         task.addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -109,8 +110,8 @@ public class BackgroundDetectedActivitiesService extends Service {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         removeActivityUpdatesButtonHandler();
         stopSpeedService();
+        super.onDestroy();
     }
 }

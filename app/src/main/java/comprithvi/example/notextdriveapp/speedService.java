@@ -53,8 +53,8 @@ public class speedService extends Service {
     int timer = 60000;
     Runnable r;
     Handler h = new Handler();
-    double speedMin = 8.04;     // 5 MPH
-    //double speedMin = 3.2198688;     // 2 MPH
+    //double speedMin = 8.04;     // 5 MPH
+    double speedMin = 3.2198688;     // 2 MPH
     String customReplyMessage = "";
     Boolean isAutoReplyOn;
 
@@ -154,10 +154,10 @@ public class speedService extends Service {
 
     public void onLocationChanged(Location location) {
         // New location has now been determined
-        String msg = "Updated Location: " +
-                Double.toString(location.getLatitude()) + "," +
-                Double.toString(location.getLongitude());
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        //String msg = "Updated Location: " +
+        //        Double.toString(location.getLatitude()) + "," +
+        //        Double.toString(location.getLongitude());
+        //Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
 
         Runnable r = new Runnable() {
             @Override
@@ -189,7 +189,8 @@ public class speedService extends Service {
             //speed = ((avgDistance/1000) / 0.00277777778);
             //speed = ((avgDistance/1000) / 0.0013888888889);
             Log.v(TAG, "Speed: " + String.valueOf(speed));
-            //Log.v(TAG, "Testing: " + String.valueOf(testing));
+            String msg = "Speed(KPH): " + Double.toString(speed);
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
         }
         // You can now create a LatLng Object for use with maps
 
@@ -218,7 +219,7 @@ public class speedService extends Service {
     public void checkSpeedAndBlock() {
         // Default speed that works is 2
 
-        if (speed > 0) {
+        if (speed > speedMin) {
             Log.v(TAG, "Notifications are being blocked");
             h.removeCallbacksAndMessages(null);     // Cancel timer
             counter = false;

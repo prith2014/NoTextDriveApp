@@ -1,9 +1,12 @@
 package comprithvi.example.notextdriveapp;
 
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
@@ -36,12 +39,18 @@ public class DetectedActivitiesIntentService  extends IntentService {
 
         for (DetectedActivity activity : detectedActivities) {
             Log.i(TAG, "Detected activity: " + activity.getType() + ", " + activity.getConfidence());
-            if(activity.getType()==DetectedActivity.IN_VEHICLE && activity.getConfidence()>70){
+            Toast.makeText(this, "Detected activity: " + activity.getType() + ", " + activity.getConfidence(), Toast.LENGTH_SHORT).show();
+            if(activity.getType()==DetectedActivity.IN_VEHICLE && activity.getConfidence()>60){
                 // Person is in vehicle with decent confidence
-                Intent intent1 = new Intent(this, speedService.class);
-                startService(intent1);
+                SharedPreferences prefs = this.getSharedPreferences("userdetails", Context.MODE_PRIVATE);
+                final SharedPreferences.Editor editPrefs = prefs.edit();
+
+                if (!(prefs.getBoolean("userdetails.isSpeedServiceOn",false))) {
+                    Intent intent1 = new Intent(this, speedService.class);
+                    startService(intent1);
+                }
             }
-            else{
+            else if (activity.getType()==DetectedActivity.IN_VEHICLE && activity.getConfidence()<60){
                 Intent intent2 = new Intent(this, speedService.class);
                 stopService(intent2);
             }
