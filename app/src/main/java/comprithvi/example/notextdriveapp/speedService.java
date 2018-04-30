@@ -217,13 +217,17 @@ public class speedService extends Service {
     }
 
     public void checkSpeedAndBlock() {
-        // Default speed that works is 2
+        // Default speed that works is 5
 
         if (speed > speedMin) {
             Log.v(TAG, "Notifications are being blocked");
+
+            // Since speed is greater than 5 KPH, Handler h will cancel Runnable r, which
+            // disables Do Not Disturb by a minute
             h.removeCallbacksAndMessages(null);     // Cancel timer
+
             counter = false;
-            startNotifBlock();          // Turn on DO not Disturb
+            startNotifBlock();          // Turn on Do not Disturb
         } else {
 
             if (!counter) {
@@ -238,6 +242,7 @@ public class speedService extends Service {
                     }
                 };
 
+                // Handler h delays Runnable r for a minute
                 h.postDelayed(r, timer);    // Timer till Do not Disturb turns on
             }
         }
