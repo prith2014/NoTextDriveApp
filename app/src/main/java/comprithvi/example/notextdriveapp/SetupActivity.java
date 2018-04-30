@@ -45,48 +45,6 @@ public class SetupActivity extends AppCompatActivity {
 
         listPairedBlueToothDevices();
 
-        // ARRAY ADAPTER
-        /*
-        // Show list of paired devices
-        pairedDeviceListView = findViewById(R.id.pairedDevicesListView);
-        pairedDeviceAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, pairedDevicesListNames);
-        pairedDeviceListView.setAdapter(pairedDeviceAdapter);
-        pairedDeviceAdapter.notifyDataSetChanged();
-
-        // Show list of paired devices ArrayList Hashmap verison (not pretty)
-        //pairedDeviceListView = findViewById(R.id.pairedDevicesListView);
-        //pairedDeviceAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, pairedDevicesList);
-        //pairedDeviceListView.setAdapter(pairedDeviceAdapter);
-        //pairedDeviceAdapter.notifyDataSetChanged();
-
-        pairedDeviceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                HashMap<String, String> selectedBTHashMap = pairedDevicesList.get(position);
-                //Set<String> bluetooth = selectedBTHashMap.keySet();
-                String selectedDeviceName = pairedDevicesListNames.get(position);
-                String selectedDeviceAddress = selectedBTHashMap.get(selectedDeviceName);
-                String bluetoothToTxt = (selectedDeviceName + '\n' + selectedDeviceAddress);
-
-                // Write Device name and address to text file
-                //writeToFile(selectedDeviceName, getApplicationContext());
-                //writeToFile(selectedDeviceAddress, getApplicationContext());
-                writeToFile(bluetoothToTxt, getApplicationContext());
-                markBluetooth();
-                // Go back to main activity
-                Intent intent = new Intent(SetupActivity.this, MainActivity.class);
-                Bundle extras = new Bundle();
-                extras.putString("EXTRA_DEVICENAME", selectedDeviceName);
-                extras.putString("EXTRA_DEVICEADDRESS", selectedDeviceAddress);
-                //intent.putExtra("map", selectedBTHashMap);
-                intent.putExtras(extras);
-                //startActivity(intent);
-                setResult(Intent_Constants.INTENT_RESULT_CODE, intent);
-                finish();
-            }
-        });
-        */
-
         // CUSTOM ADAPTER
         pairedDeviceListView = findViewById(R.id.pairedDevicesListView);
         CustomAdapterBluetooth customAdapterBluetooth = new CustomAdapterBluetooth();

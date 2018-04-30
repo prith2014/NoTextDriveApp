@@ -192,7 +192,6 @@ public class speedService extends Service {
             String msg = "Speed(KPH): " + Double.toString(speed);
             Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
         }
-        // You can now create a LatLng Object for use with maps
 
     }
 

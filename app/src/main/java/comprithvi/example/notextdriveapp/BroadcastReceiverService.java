@@ -82,10 +82,8 @@ public class BroadcastReceiverService extends Service {
 
                     isBluetoothConnected = true;
 
-                    //if ( adapter.getProfileConnectionState(BluetoothProfile.HEADSET) == BluetoothProfile.STATE_CONNECTED) {
-                    //if ( adapter.getProfileConnectionState(BluetoothProfile.A2DP) == BluetoothProfile.STATE_CONNECTED) {
-                        if (!isSoftDisableOn)
-                            launchSpeedService();
+                    if (!isSoftDisableOn)
+                        launchSpeedService();
 
                 }
             }
@@ -215,12 +213,8 @@ public class BroadcastReceiverService extends Service {
                 isSoftDisableOn = false;
                 softDisableRunning = false;
                 editPrefs.putBoolean("userdetails.isSoftDisableOn", isSoftDisableOn);
-                //String softDisableString = String.valueOf(isSoftDisableOn) + '\n' + String.valueOf(softDisableTimer);
-                //writeToFileSoftDisable(softDisableString, getApplicationContext());
-                //BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 
-                //if ( adapter.getProfileConnectionState(BluetoothProfile.A2DP) == BluetoothProfile.STATE_CONNECTED)
-                    launchSpeedService();
+                launchSpeedService();
             }
         };
         h = new Handler();

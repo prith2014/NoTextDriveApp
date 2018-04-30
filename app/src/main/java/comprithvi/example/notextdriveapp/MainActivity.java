@@ -112,31 +112,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        /*
-        final AlertDialog.Builder alert = new AlertDialog.Builder(getApplicationContext());
-        alert.setTitle("Set Custom Auto-Reply Message");
-        alert.setMessage("Message");
-
-        // Set an EditText view to get user input
-        final EditText input = new EditText(getApplicationContext());
-        alert.setView(input);
-
-        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                // Do something with value!
-                dialog.dismiss();
-                customReplyMessage = input.getText().toString();
-                editPrefs.putString("userdetails.customReplyMessage",customReplyMessage).apply();
-            }
-        });
-
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                // Canceled.
-                dialog.cancel();
-            }
-        });
-        */
         final Button customReplyButton = findViewById(R.id.button);
         customReplyButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -145,11 +120,6 @@ public class MainActivity extends AppCompatActivity {
                 final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle("Auto-Reply");
                 builder.setMessage("Set Custom Auto-Reply Message");
-
-                //View viewInflated = LayoutInflater.from(getApplicationContext()).inflate(R.layout.text_input, (ViewGroup) findViewById(android.R.id.content), false);
-
-                //final EditText input = viewInflated.findViewById(R.id.input);
-                //builder.setView(viewInflated);
 
                 final EditText input = new EditText(MainActivity.this);
                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
@@ -181,8 +151,6 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                 }, 200L);
-                //builder.show();
-                //alert.show();
             }
         });
 
@@ -351,52 +319,7 @@ public class MainActivity extends AppCompatActivity {
             notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         }
         create_notification_channel();
-        /*
-        // Send Notification
-        Button send = findViewById(R.id.send);
-        send.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                postNotification("Title", "text");
-            }
-        });
 
-        // Start Notification Blocking
-        Button start = findViewById(R.id.start);
-        start.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startNotifBlock();
-            }
-        });
-
-        // Stop Notification Blocking
-        Button stop = findViewById(R.id.stop);
-        stop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                stopNotifBlock();
-            }
-        });
-
-        Button startAPI = findViewById(R.id.startAPI);
-        startAPI.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, BackgroundDetectedActivitiesService.class);
-                startService(intent);
-            }
-        });
-
-        Button stopAPI = findViewById(R.id.stopAPI);
-        stopAPI.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, BackgroundDetectedActivitiesService.class);
-                stopService(intent);
-            }
-        });
-        */
         // Request location permission
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED &&
@@ -437,42 +360,6 @@ public class MainActivity extends AppCompatActivity {
             permission_list[0] = permission2;
             ActivityCompat.requestPermissions(this, permission_list, 1);
         }
-
-        // Soft Disable Spinner
-        /*
-        Spinner softDisableSpinner = findViewById(R.id.spinner_softdisable);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, softDisableOptions);
-        adapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
-        softDisableSpinner.setAdapter(adapter);
-        softDisableSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                switch (position) {
-                    case 0:
-                        //softDisableTimer = 60000*30;
-                        softDisableTimer = 30000;
-                        editPrefs.putInt("userdetails.softDisableTimer", softDisableTimer).apply();
-                        break;
-                    case 1:
-                        softDisableTimer = 60000*60;
-                        editPrefs.putInt("userdetails.softDisableTimer", softDisableTimer).apply();
-                        break;
-                    case 2:
-                        softDisableTimer = 60000*120;
-                        editPrefs.putInt("userdetails.softDisableTimer", softDisableTimer).apply();
-                        break;
-                    default:
-                        editPrefs.putInt("userdetails.softDisableTimer", 60000*30).apply();
-                        break;
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-        */
 
     }
 
@@ -591,95 +478,4 @@ public class MainActivity extends AppCompatActivity {
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL);
     }
-
-
-    //--------------------------- SPEED CALC FUNCTIONS ---------------------------------------//
-
-    /*
-    protected void startLocationUpdates() {
-        // Create the location request to start receiving updates
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setInterval(5000);
-        mLocationRequest.setFastestInterval(5000);
-
-        // new Google API SDK v11 uses getFusedLocationProviderClient(this)
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION},REQUEST_LOCATION);
-            return;
-        }
-
-        getFusedLocationProviderClient(this).requestLocationUpdates(mLocationRequest, new LocationCallback() {
-                    @Override
-                    public void onLocationResult(LocationResult locationResult) {
-                        // do work here
-                        currentLocation = locationResult.getLastLocation();
-                        onLocationChanged(locationResult.getLastLocation());
-                    }
-                },
-                Looper.myLooper());
-    }
-
-    public void onLocationChanged(Location location) {
-        // New location has now been determined
-
-        //String msg = "Updated Location: " +
-        //        Double.toString(location.getLatitude()) + "," +
-        //        Double.toString(location.getLongitude());
-        //Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                if (currentLocation != null) {
-                    prevLocation = currentLocation;
-                    prevTime = prevLocation.getTime();
-                }
-                if (prevLocation != null) {
-                    prevLocation2 = prevLocation;
-                    prevTime2 = prevLocation2.getTime();
-                }
-            }
-        };
-
-        Handler h = new Handler();
-        h.postDelayed(r, 50);
-
-
-        currentTime = currentLocation.getTime();
-        longitude.setText(Double.toString(currentLocation.getLongitude()));
-        latitude.setText(Double.toString(currentLocation.getLatitude()));
-
-        if (prevLocation2 != null) {
-            float distance = prevLocation.distanceTo(currentLocation);
-            float distance2 = prevLocation2.distanceTo(prevLocation);
-            float avgDistance = (distance + distance2)/2;
-            distanceTV.setText(Float.toString(distance));
-            //long timeDifference = currentTime - prevTime;
-            double speed = ((avgDistance/1000) / 0.00277777778);
-            speedTV.setText(Double.toString(speed));
-        }
-        // You can now create a LatLng Object for use with maps
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        startLocationUpdates();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        startLocationUpdates();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-    */
 }
